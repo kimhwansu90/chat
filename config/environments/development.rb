@@ -3,6 +3,11 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # ngrok 및 외부 접속을 위한 호스트 허용
+  config.hosts << "lynn-overpowering-yulanda.ngrok-free.dev"
+  config.hosts << /[a-z0-9\-]+\.ngrok-free\.dev/  # 모든 ngrok URL 허용
+  config.hosts.clear  # 개발 환경에서는 모든 호스트 허용
+
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 
@@ -67,8 +72,13 @@ Rails.application.configure do
   # Annotate rendered view with file names.
   config.action_view.annotate_rendered_view_with_filenames = true
 
-  # Uncomment if you wish to allow Action Cable access from any origin.
-  # config.action_cable.disable_request_forgery_protection = true
+  # ActionCable을 모든 오리진에서 접속 가능하도록 설정 (개발 환경)
+  config.action_cable.disable_request_forgery_protection = true
+  config.action_cable.allowed_request_origins = [
+    "http://localhost:3000",
+    "https://lynn-overpowering-yulanda.ngrok-free.dev",
+    /https:\/\/.*\.ngrok-free\.dev/
+  ]
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
