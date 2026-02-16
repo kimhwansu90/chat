@@ -90,10 +90,8 @@ document.addEventListener("turbo:load", function() {
     });
   }
   
-  // 폼 제출 이벤트 리스너
-  messageForm.addEventListener("submit", async function(e) {
-    e.preventDefault(); // 기본 폼 제출 동작 방지
-    
+  // 메시지 전송 함수
+  async function sendMessage() {
     const content = messageInput.value.trim();
     
     // 빈 메시지는 전송하지 않음
@@ -102,7 +100,7 @@ document.addEventListener("turbo:load", function() {
     }
     
     // 메시지 전송 중 버튼 비활성화
-    const submitButton = messageForm.querySelector("button[type='submit']");
+    const submitButton = messageForm.querySelector("#send-button");
     submitButton.disabled = true;
     
     try {
@@ -135,7 +133,36 @@ document.addEventListener("turbo:load", function() {
       // 버튼 다시 활성화
       submitButton.disabled = false;
     }
+  }
+  
+  // 폼 제출 이벤트 리스너
+  messageForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    sendMessage();
   });
+  
+  // 모바일 엔터키 감지 (추가 지원)
+  messageInput.addEventListener("keypress", function(e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+  
+  // 전송 버튼 직접 클릭 (모바일 터치 지원)
+  const sendButton = document.getElementById("send-button");
+  if (sendButton) {
+    sendButton.addEventListener("click", function(e) {
+      e.preventDefault();
+      sendMessage();
+    });
+    
+    // 터치 이벤트도 추가 (모바일 최적화)
+    sendButton.addEventListener("touchend", function(e) {
+      e.preventDefault();
+      sendMessage();
+    });
+  }
 });
 
 // 메시지 컨테이너를 맨 아래로 스크롤

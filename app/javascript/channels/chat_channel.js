@@ -27,9 +27,6 @@ consumer.subscriptions.create("ChatChannel", {
     // 새 메시지 수신
     const messagesContainer = document.getElementById("messages");
     if (messagesContainer) {
-      // 오늘 날짜 구분선이 없으면 추가
-      this.addDateDividerIfNeeded(messagesContainer);
-      
       const messageDiv = this.createMessageElement(data);
       messagesContainer.appendChild(messageDiv);
       
@@ -40,21 +37,6 @@ consumer.subscriptions.create("ChatChannel", {
       if (data.username !== window.currentUser) {
         this.markMessageAsRead(data.id);
       }
-    }
-  },
-  
-  // 날짜 구분선 추가 (필요한 경우)
-  addDateDividerIfNeeded(container) {
-    const today = new Date().toDateString();
-    const lastDivider = container.querySelector('.date-divider:last-of-type');
-    
-    // 마지막 날짜 구분선이 오늘이 아니면 추가
-    if (!lastDivider || lastDivider.getAttribute('data-date') !== today) {
-      const divider = document.createElement('div');
-      divider.className = 'date-divider';
-      divider.setAttribute('data-date', today);
-      divider.innerHTML = '<span class="date-divider-text">오늘</span>';
-      container.appendChild(divider);
     }
   },
   

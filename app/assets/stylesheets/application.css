@@ -657,6 +657,29 @@ body {
     padding: 16px;
   }
   
+  /* 모바일 메시지 입력 영역 */
+  .message-input-container {
+    padding: 12px 16px;
+  }
+  
+  .message-input {
+    font-size: 16px; /* iOS 자동 줌 방지 */
+    padding: 12px 16px;
+  }
+  
+  .btn-emoji {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+  
+  .btn-send {
+    width: 44px;
+    height: 44px;
+    min-width: 44px; /* 터치 영역 확보 */
+    min-height: 44px;
+  }
+  
   /* 모바일에서 이모티콘 피커 크기 조정 */
   .emoji-picker {
     width: calc(100vw - 48px);
@@ -666,5 +689,11 @@ body {
   
   .emoji-grid {
     grid-template-columns: repeat(7, 1fr);
+  }
+  
+  /* 날짜 구분선 모바일 */
+  .date-divider-text {
+    font-size: 12px;
+    padding: 4px 12px;
   }
 }

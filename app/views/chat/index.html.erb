@@ -23,27 +23,21 @@
     <% 
       # 요일 계산용
       weekdays = ['일', '월', '화', '수', '목', '금', '토']
-      last_date = nil
     %>
     
-    <% @messages.each_with_index do |message, index| %>
+    <!-- 맨 처음 날짜 구분선만 표시 (첫 메시지가 있을 때) -->
+    <% if @messages.any? %>
+      <% first_message = @messages.first %>
+      <% first_date = first_message.created_at.to_date %>
+      <div class="date-divider" data-date="<%= first_date %>">
+        <span class="date-divider-text">
+          <%= first_date.strftime("#{first_date.year}년 #{first_date.month}월 #{first_date.day}일 #{weekdays[first_date.wday]}요일") %>
+        </span>
+      </div>
+    <% end %>
+    
+    <% @messages.each do |message| %>
       <% current_date = message.created_at.to_date %>
-      
-      <!-- 날짜가 바뀌면 날짜 구분선 표시 -->
-      <% if last_date != current_date %>
-        <div class="date-divider" data-date="<%= current_date %>">
-          <span class="date-divider-text">
-            <% if current_date == Date.today %>
-              오늘
-            <% elsif current_date == Date.today - 1 %>
-              어제
-            <% else %>
-              <%= current_date.strftime("#{current_date.month}월 #{current_date.day}일 (#{weekdays[current_date.wday]})") %>
-            <% end %>
-          </span>
-        </div>
-        <% last_date = current_date %>
-      <% end %>
       
       <!-- 메시지 -->
       <div class="message <%= 'message-mine' if message.username == current_user %>" data-message-id="<%= message.id %>" data-date="<%= current_date %>">
@@ -73,23 +67,25 @@
   
   <!-- 메시지 입력 영역 -->
   <div class="message-input-container">
-    <form id="message-form" class="message-form">
+    <form id="message-form" class="message-form" action="javascript:void(0);">
       <!-- 이모티콘 버튼 -->
       <button type="button" id="emoji-button" class="btn-emoji" title="이모티콘">
         😊
       </button>
       
-      <!-- 메시지 입력창 -->
+      <!-- 메시지 입력창 (모바일 엔터키 지원) -->
       <input 
         type="text" 
         id="message-input" 
         class="message-input" 
         placeholder="메시지를 입력하세요..." 
         autocomplete="off"
+        enterkeyhint="send"
+        inputmode="text"
         required>
       
       <!-- 전송 버튼 -->
-      <button type="submit" class="btn-send" title="전송">
+      <button type="submit" class="btn-send" id="send-button" title="전송">
         <!-- 전송 아이콘 -->
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
