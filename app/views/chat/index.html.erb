@@ -45,7 +45,7 @@
         <div class="message-bubble-wrapper">
           <% unless message.username == current_user %>
             <!-- 상대방 메시지: 닉네임 표시 (세션 또는 기본값) -->
-            <div class="message-sender"><%= @nicknames[message.username] || message.username %></div>
+            <div class="message-sender"><%= @nicknames[message.username] || message.nickname || message.username %></div>
           <% end %>
           <div class="message-content-wrapper">
             <div class="message-content">

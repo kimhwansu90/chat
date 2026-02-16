@@ -37,14 +37,18 @@ class ApplicationController < ActionController::Base
     end
   end
   
-  # 닉네임이 없는 경우 닉네임 설정 페이지로 리다이렉트
-  # 이제 로그인 시 자동으로 닉네임이 설정되므로 이 메서드는 필요 없지만
-  # 혹시 모를 경우를 대비해 유지
+  # 닉네임이 없는 경우 DB에서 로드하여 세션에 설정
   def require_nickname
     if logged_in? && !nickname_set?
-      # 기본 닉네임 설정 (만약 세션에 없다면)
-      user_info = SessionsController::USERS[current_user]
-      session[:nickname] = user_info[:nickname] if user_info
+      user = User.find_by(username: current_user)
+      if user&.nickname.present?
+        session[:nickname] = user.nickname
+      else
+        # DB에도 없으면 기본 닉네임 설정
+        default_nickname = SessionsController::USERS.dig(current_user, :nickname) || current_user
+        user&.update(nickname: default_nickname) if user
+        session[:nickname] = default_nickname
+      end
     end
   end
 end
