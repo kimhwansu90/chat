@@ -63,21 +63,9 @@ class ChatController < ApplicationController
   
   private
   
-  # 메시지 시간 포맷 (날짜, 요일 포함)
+  # 메시지 시간 포맷 (시간만 표시)
   def format_message_time(time)
-    # 한글 요일 배열
-    weekdays = ['일', '월', '화', '수', '목', '금', '토']
-    weekday = weekdays[time.wday]
-    
-    if time.to_date == Date.today
-      # 오늘이면 시간만 표시
-      time.strftime("%H:%M")
-    elsif time.to_date == Date.today - 1
-      # 어제면 "어제" 표시
-      "어제 #{time.strftime('%H:%M')}"
-    else
-      # 그 외에는 날짜, 요일, 시간 모두 표시
-      time.strftime("%m월 %d일 (#{weekday}) %H:%M")
-    end
+    # 날짜 구분선이 있으므로 시간만 표시
+    time.strftime("%H:%M")
   end
 end

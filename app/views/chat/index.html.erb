@@ -20,39 +20,52 @@
   
   <!-- 메시지 영역 -->
   <div class="messages-container" id="messages">
-    <% @messages.each do |message| %>
-      <% 
-        # 요일 계산
-        weekdays = ['일', '월', '화', '수', '목', '금', '토']
-        weekday = weekdays[message.created_at.wday]
-      %>
-      <div class="message <%= 'message-mine' if message.username == current_user %>" data-message-id="<%= message.id %>">
-        <div class="message-header">
-          <span class="message-username"><%= message.username %></span>
-          <span class="message-time">
-            <% if message.created_at.to_date == Date.today %>
-              <%= message.created_at.strftime("%H:%M") %>
-            <% elsif message.created_at.to_date == Date.today - 1 %>
-              어제 <%= message.created_at.strftime("%H:%M") %>
+    <% 
+      # 요일 계산용
+      weekdays = ['일', '월', '화', '수', '목', '금', '토']
+      last_date = nil
+    %>
+    
+    <% @messages.each_with_index do |message, index| %>
+      <% current_date = message.created_at.to_date %>
+      
+      <!-- 날짜가 바뀌면 날짜 구분선 표시 -->
+      <% if last_date != current_date %>
+        <div class="date-divider" data-date="<%= current_date %>">
+          <span class="date-divider-text">
+            <% if current_date == Date.today %>
+              오늘
+            <% elsif current_date == Date.today - 1 %>
+              어제
             <% else %>
-              <%= message.created_at.strftime("%m월 %d일 (#{weekday}) %H:%M") %>
+              <%= current_date.strftime("#{current_date.month}월 #{current_date.day}일 (#{weekdays[current_date.wday]})") %>
             <% end %>
           </span>
         </div>
-        <div class="message-content-wrapper">
-          <div class="message-content">
-            <%= message.content %>
+        <% last_date = current_date %>
+      <% end %>
+      
+      <!-- 메시지 -->
+      <div class="message <%= 'message-mine' if message.username == current_user %>" data-message-id="<%= message.id %>" data-date="<%= current_date %>">
+        <div class="message-bubble-wrapper">
+          <div class="message-content-wrapper">
+            <div class="message-content">
+              <%= message.content %>
+            </div>
           </div>
-          <% if message.username == current_user %>
-            <!-- 내가 보낸 메시지에만 읽음 표시 -->
-            <span class="read-status" data-read-count="<%= message.read_count_except_sender %>">
-              <% if message.read_count_except_sender == 0 %>
-                <span class="checkmark single">✓</span>
-              <% else %>
-                <span class="checkmark double">✓✓</span>
-              <% end %>
-            </span>
-          <% end %>
+          <div class="message-info">
+            <% if message.username == current_user %>
+              <!-- 내가 보낸 메시지: 읽음 표시 + 시간 -->
+              <span class="read-status" data-read-count="<%= message.read_count_except_sender %>">
+                <% if message.read_count_except_sender == 0 %>
+                  <span class="checkmark single">✓</span>
+                <% else %>
+                  <span class="checkmark double">✓✓</span>
+                <% end %>
+              </span>
+            <% end %>
+            <span class="message-time"><%= message.created_at.strftime("%H:%M") %></span>
+          </div>
         </div>
       </div>
     <% end %>

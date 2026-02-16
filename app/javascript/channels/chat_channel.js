@@ -27,6 +27,9 @@ consumer.subscriptions.create("ChatChannel", {
     // 새 메시지 수신
     const messagesContainer = document.getElementById("messages");
     if (messagesContainer) {
+      // 오늘 날짜 구분선이 없으면 추가
+      this.addDateDividerIfNeeded(messagesContainer);
+      
       const messageDiv = this.createMessageElement(data);
       messagesContainer.appendChild(messageDiv);
       
@@ -40,14 +43,31 @@ consumer.subscriptions.create("ChatChannel", {
     }
   },
   
+  // 날짜 구분선 추가 (필요한 경우)
+  addDateDividerIfNeeded(container) {
+    const today = new Date().toDateString();
+    const lastDivider = container.querySelector('.date-divider:last-of-type');
+    
+    // 마지막 날짜 구분선이 오늘이 아니면 추가
+    if (!lastDivider || lastDivider.getAttribute('data-date') !== today) {
+      const divider = document.createElement('div');
+      divider.className = 'date-divider';
+      divider.setAttribute('data-date', today);
+      divider.innerHTML = '<span class="date-divider-text">오늘</span>';
+      container.appendChild(divider);
+    }
+  },
+  
   // 메시지 HTML 엘리먼트 생성
   createMessageElement(data) {
     const messageDiv = document.createElement("div");
+    const today = new Date().toDateString();
     
     // 내가 보낸 메시지인지 확인
     const isMine = data.username === window.currentUser;
     messageDiv.className = isMine ? "message message-mine" : "message";
     messageDiv.setAttribute("data-message-id", data.id);
+    messageDiv.setAttribute("data-date", today);
     
     // 읽음 표시 HTML (내가 보낸 메시지에만 표시)
     const readStatusHtml = isMine ? `
@@ -57,15 +77,16 @@ consumer.subscriptions.create("ChatChannel", {
     ` : '';
     
     messageDiv.innerHTML = `
-      <div class="message-header">
-        <span class="message-username">${this.escapeHtml(data.username)}</span>
-        <span class="message-time">${data.created_at}</span>
-      </div>
-      <div class="message-content-wrapper">
-        <div class="message-content">
-          ${this.escapeHtml(data.content)}
+      <div class="message-bubble-wrapper">
+        <div class="message-content-wrapper">
+          <div class="message-content">
+            ${this.escapeHtml(data.content)}
+          </div>
         </div>
-        ${readStatusHtml}
+        <div class="message-info">
+          ${readStatusHtml}
+          <span class="message-time">${data.created_at}</span>
+        </div>
       </div>
     `;
     
