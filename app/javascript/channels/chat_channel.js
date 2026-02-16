@@ -27,6 +27,9 @@ consumer.subscriptions.create("ChatChannel", {
     // 새 메시지 수신
     const messagesContainer = document.getElementById("messages");
     if (messagesContainer) {
+      // 날짜 구분선 추가 (카카오톡 스타일)
+      this.addDateDividerIfNeeded();
+      
       const messageDiv = this.createMessageElement(data);
       messagesContainer.appendChild(messageDiv);
       
@@ -37,6 +40,47 @@ consumer.subscriptions.create("ChatChannel", {
       if (data.username !== window.currentUser) {
         this.markMessageAsRead(data.id);
       }
+    }
+  },
+  
+  // 날짜가 바뀌면 날짜 구분선 추가 (카카오톡 스타일)
+  addDateDividerIfNeeded() {
+    const messagesContainer = document.getElementById("messages");
+    const messages = messagesContainer.querySelectorAll(".message");
+    const today = new Date();
+    const todayStr = today.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+    
+    // 이미 오늘 날짜 구분선이 있는지 확인
+    const existingDividers = messagesContainer.querySelectorAll(".date-divider");
+    const todayDate = today.toDateString();
+    let hasTodayDivider = false;
+    
+    existingDividers.forEach(divider => {
+      if (divider.getAttribute("data-date") === todayDate) {
+        hasTodayDivider = true;
+      }
+    });
+    
+    // 마지막 메시지의 날짜 확인
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      const lastMessageDate = lastMessage.getAttribute("data-date");
+      
+      // 마지막 메시지와 오늘 날짜가 다르고, 오늘 날짜 구분선이 없으면 추가
+      if (lastMessageDate !== todayDate && !hasTodayDivider) {
+        const divider = document.createElement("div");
+        divider.className = "date-divider";
+        divider.setAttribute("data-date", todayDate);
+        divider.innerHTML = `<span class="date-divider-text">${todayStr}</span>`;
+        messagesContainer.appendChild(divider);
+      }
+    } else if (!hasTodayDivider) {
+      // 첫 메시지인 경우 날짜 구분선 추가
+      const divider = document.createElement("div");
+      divider.className = "date-divider";
+      divider.setAttribute("data-date", todayDate);
+      divider.innerHTML = `<span class="date-divider-text">${todayStr}</span>`;
+      messagesContainer.appendChild(divider);
     }
   },
   

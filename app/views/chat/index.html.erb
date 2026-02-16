@@ -23,21 +23,22 @@
     <% 
       # 요일 계산용
       weekdays = ['일', '월', '화', '수', '목', '금', '토']
+      # 이전 날짜 추적 (날짜가 바뀔 때마다 구분선 표시)
+      previous_date = nil
     %>
-    
-    <!-- 맨 처음 날짜 구분선만 표시 (첫 메시지가 있을 때) -->
-    <% if @messages.any? %>
-      <% first_message = @messages.first %>
-      <% first_date = first_message.created_at.to_date %>
-      <div class="date-divider" data-date="<%= first_date %>">
-        <span class="date-divider-text">
-          <%= first_date.strftime("#{first_date.year}년 #{first_date.month}월 #{first_date.day}일 #{weekdays[first_date.wday]}요일") %>
-        </span>
-      </div>
-    <% end %>
     
     <% @messages.each do |message| %>
       <% current_date = message.created_at.to_date %>
+      
+      <!-- 날짜가 바뀌면 날짜 구분선 표시 (카카오톡 스타일) -->
+      <% if previous_date.nil? || previous_date != current_date %>
+        <div class="date-divider" data-date="<%= current_date %>">
+          <span class="date-divider-text">
+            <%= current_date.strftime("#{current_date.year}년 #{current_date.month}월 #{current_date.day}일 #{weekdays[current_date.wday]}요일") %>
+          </span>
+        </div>
+        <% previous_date = current_date %>
+      <% end %>
       
       <!-- 메시지 -->
       <div class="message <%= 'message-mine' if message.username == current_user %>" data-message-id="<%= message.id %>" data-date="<%= current_date %>">
