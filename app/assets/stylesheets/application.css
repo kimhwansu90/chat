@@ -1,0 +1,652 @@
+/*
+ * 별라채팅 - 메인 스타일시트
+ * 텔레그램 스타일의 심플하고 세련된 디자인
+ */
+
+/* ========================================
+   1. 기본 스타일 (Reset & Typography)
+   ======================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* ========================================
+   2. Flash 메시지 (알림)
+   ======================================== */
+
+.flash-notice,
+.flash-alert {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.flash-notice {
+  background: #10b981;
+  color: white;
+}
+
+.flash-alert {
+  background: #ef4444;
+  color: white;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   3. 로그인 페이지 스타일
+   ======================================== */
+
+.login-container {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+}
+
+.login-box {
+  background: white;
+  border-radius: 24px;
+  padding: 48px 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.app-logo {
+  margin-bottom: 16px;
+}
+
+.star-icon {
+  font-size: 64px;
+  display: inline-block;
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+.app-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.app-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.login-form {
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 16px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: #f9fafb;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-login {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-login:active {
+  transform: translateY(0);
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.info-text {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* ========================================
+   4. 채팅 페이지 스타일
+   ======================================== */
+
+.chat-container {
+  width: 100%;
+  max-width: 1200px;
+  height: 90vh;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 20px;
+}
+
+/* 채팅 헤더 */
+.chat-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.app-logo-small {
+  font-size: 32px;
+}
+
+.header-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.online-status {
+  font-size: 13px;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.current-user {
+  font-size: 15px;
+  font-weight: 500;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.btn-logout {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  font-family: inherit;
+}
+
+.btn-logout:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+/* 메시지 컨테이너 */
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 스크롤바 스타일 */
+.messages-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.messages-container::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* 메시지 스타일 */
+.message {
+  max-width: 70%;
+  align-self: flex-start;
+  animation: messageIn 0.3s ease-out;
+}
+
+.message-mine {
+  align-self: flex-end;
+}
+
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  padding: 0 4px;
+}
+
+.message-username {
+  font-size: 13px;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.message-mine .message-username {
+  color: #764ba2;
+}
+
+.message-time {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* 메시지 컨텐츠 래퍼 (읽음 표시 포함) */
+.message-content-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.message-content {
+  background: white;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #1f2937;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  word-wrap: break-word;
+}
+
+.message-mine .message-content {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+/* 읽음 표시 */
+.read-status {
+  font-size: 11px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+  flex-shrink: 0;
+}
+
+.message-mine .read-status {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.checkmark {
+  font-weight: bold;
+  display: inline-block;
+}
+
+.checkmark.single {
+  color: #9ca3af;
+}
+
+.checkmark.double {
+  color: #667eea;
+  animation: checkmarkPulse 0.3s ease-out;
+}
+
+.message-mine .checkmark.single {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.message-mine .checkmark.double {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes checkmarkPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 메시지 입력 영역 */
+.message-input-container {
+  background: white;
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.message-form {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.message-input {
+  flex: 1;
+  padding: 14px 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 24px;
+  font-size: 15px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: #f9fafb;
+}
+
+.message-input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-send {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-send:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-send:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.btn-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 이모티콘 버튼 */
+.btn-emoji {
+  width: 48px;
+  height: 48px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 24px;
+}
+
+.btn-emoji:hover {
+  background: #e5e7eb;
+  transform: scale(1.05);
+}
+
+.btn-emoji:active {
+  transform: scale(0.95);
+}
+
+/* 이모티콘 피커 */
+.emoji-picker {
+  position: absolute;
+  bottom: 80px;
+  left: 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  width: 320px;
+  max-height: 360px;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  animation: emojiPickerIn 0.2s ease-out;
+}
+
+@keyframes emojiPickerIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.emoji-picker-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 16px 16px 0 0;
+}
+
+.emoji-category {
+  font-size: 14px;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.emoji-grid {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  overflow-y: auto;
+  max-height: 280px;
+}
+
+/* 이모티콘 그리드 스크롤바 */
+.emoji-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.emoji-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 0 0 16px 0;
+}
+
+.emoji-grid::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.emoji-grid::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.emoji-item {
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.emoji-item:hover {
+  background: #f3f4f6;
+  transform: scale(1.2);
+}
+
+.emoji-item:active {
+  transform: scale(1.1);
+}
+
+/* ========================================
+   5. 반응형 디자인 (모바일)
+   ======================================== */
+
+@media (max-width: 768px) {
+  body {
+    padding: 0;
+  }
+  
+  .login-box {
+    padding: 36px 28px;
+    border-radius: 16px;
+  }
+  
+  .chat-container {
+    height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    max-width: 100%;
+  }
+  
+  .chat-header {
+    padding: 16px 20px;
+  }
+  
+  .chat-title {
+    font-size: 18px;
+  }
+  
+  .current-user {
+    display: none;
+  }
+  
+  .message {
+    max-width: 85%;
+  }
+  
+  .messages-container {
+    padding: 16px;
+  }
+  
+  /* 모바일에서 이모티콘 피커 크기 조정 */
+  .emoji-picker {
+    width: calc(100vw - 48px);
+    left: 24px;
+    right: 24px;
+  }
+  
+  .emoji-grid {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}

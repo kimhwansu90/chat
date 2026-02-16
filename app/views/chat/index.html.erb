@@ -1,0 +1,103 @@
+<!-- 채팅 메인 페이지 -->
+<div class="chat-container">
+  <!-- 상단 헤더 -->
+  <div class="chat-header">
+    <div class="header-left">
+      <div class="app-logo-small">
+        <span class="star-icon">⭐</span>
+      </div>
+      <div class="header-info">
+        <h2 class="chat-title">별라채팅</h2>
+        <span class="online-status">● 온라인</span>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <span class="current-user"><%= current_user %></span>
+      <%= button_to "로그아웃", logout_path, method: :delete, class: "btn-logout" %>
+    </div>
+  </div>
+  
+  <!-- 메시지 영역 -->
+  <div class="messages-container" id="messages">
+    <% @messages.each do |message| %>
+      <% 
+        # 요일 계산
+        weekdays = ['일', '월', '화', '수', '목', '금', '토']
+        weekday = weekdays[message.created_at.wday]
+      %>
+      <div class="message <%= 'message-mine' if message.username == current_user %>" data-message-id="<%= message.id %>">
+        <div class="message-header">
+          <span class="message-username"><%= message.username %></span>
+          <span class="message-time">
+            <% if message.created_at.to_date == Date.today %>
+              <%= message.created_at.strftime("%H:%M") %>
+            <% elsif message.created_at.to_date == Date.today - 1 %>
+              어제 <%= message.created_at.strftime("%H:%M") %>
+            <% else %>
+              <%= message.created_at.strftime("%m월 %d일 (#{weekday}) %H:%M") %>
+            <% end %>
+          </span>
+        </div>
+        <div class="message-content-wrapper">
+          <div class="message-content">
+            <%= message.content %>
+          </div>
+          <% if message.username == current_user %>
+            <!-- 내가 보낸 메시지에만 읽음 표시 -->
+            <span class="read-status" data-read-count="<%= message.read_count_except_sender %>">
+              <% if message.read_count_except_sender == 0 %>
+                <span class="checkmark single">✓</span>
+              <% else %>
+                <span class="checkmark double">✓✓</span>
+              <% end %>
+            </span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- 메시지 입력 영역 -->
+  <div class="message-input-container">
+    <form id="message-form" class="message-form">
+      <!-- 이모티콘 버튼 -->
+      <button type="button" id="emoji-button" class="btn-emoji" title="이모티콘">
+        😊
+      </button>
+      
+      <!-- 메시지 입력창 -->
+      <input 
+        type="text" 
+        id="message-input" 
+        class="message-input" 
+        placeholder="메시지를 입력하세요..." 
+        autocomplete="off"
+        required>
+      
+      <!-- 전송 버튼 -->
+      <button type="submit" class="btn-send" title="전송">
+        <!-- 전송 아이콘 -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </form>
+    
+    <!-- 이모티콘 피커 -->
+    <div id="emoji-picker" class="emoji-picker" style="display: none;">
+      <div class="emoji-picker-header">
+        <span class="emoji-category">자주 사용</span>
+      </div>
+      <div class="emoji-grid" id="emoji-grid">
+        <!-- JavaScript로 이모티콘 추가 -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript로 현재 사용자 이름 전달 -->
+<script>
+  window.currentUser = "<%= current_user %>";
+</script>

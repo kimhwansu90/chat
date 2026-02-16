@@ -1,0 +1,44 @@
+<!-- 로그인 페이지 -->
+<div class="login-container">
+  <div class="login-box">
+    <!-- 앱 로고 및 제목 -->
+    <div class="login-header">
+      <div class="app-logo">
+        <!-- 별 아이콘 (텍스트로 표현) -->
+        <span class="star-icon">⭐</span>
+      </div>
+      <h1 class="app-title">별라채팅</h1>
+      <p class="app-subtitle">프라이빗 메시징</p>
+    </div>
+    
+    <!-- 로그인 폼 -->
+    <%= form_with url: login_path, method: :post, class: "login-form" do |f| %>
+      <!-- 아이디 입력 -->
+      <div class="form-group">
+        <%= f.text_field :username, 
+            placeholder: "아이디", 
+            class: "form-input",
+            required: true,
+            autofocus: true %>
+      </div>
+      
+      <!-- 비밀번호 입력 -->
+      <div class="form-group">
+        <%= f.password_field :password, 
+            placeholder: "비밀번호", 
+            class: "form-input",
+            required: true %>
+      </div>
+      
+      <!-- 로그인 버튼 -->
+      <div class="form-group">
+        <%= f.submit "로그인", class: "btn-login" %>
+      </div>
+    <% end %>
+    
+    <!-- 안내 메시지 -->
+    <div class="login-footer">
+      <p class="info-text">인가된 사용자만 접속할 수 있습니다</p>
+    </div>
+  </div>
+</div>
