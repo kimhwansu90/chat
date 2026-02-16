@@ -67,7 +67,7 @@
   
   <!-- 메시지 입력 영역 -->
   <div class="message-input-container">
-    <div class="message-form">
+    <div class="message-form" style="display: grid !important; grid-template-columns: 44px 1fr 44px !important; gap: 8px !important;">
       <!-- 이모티콘 버튼 -->
       <button type="button" id="emoji-button" class="btn-emoji" title="이모티콘">
         😊
@@ -83,7 +83,7 @@
         enterkeyhint="send">
       
       <!-- 전송 버튼 -->
-      <button type="button" class="btn-send" id="send-button" title="전송">
+      <button type="button" class="btn-send" id="send-button" title="전송" style="width: 44px !important; height: 44px !important; display: flex !important; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; border-radius: 50% !important; border: none !important;">
         <!-- 전송 아이콘 -->
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
