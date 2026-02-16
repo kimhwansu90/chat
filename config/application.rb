@@ -21,7 +21,9 @@ module Chat
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # 한국 시간대 설정 (KST, UTC+9)
+    config.time_zone = "Asia/Seoul"
+    config.active_record.default_timezone = :local
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
