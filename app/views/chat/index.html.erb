@@ -44,8 +44,8 @@
       <div class="message <%= 'message-mine' if message.username == current_user %>" data-message-id="<%= message.id %>" data-date="<%= current_date %>">
         <div class="message-bubble-wrapper">
           <% unless message.username == current_user %>
-            <!-- 상대방 메시지: 닉네임 표시 -->
-            <div class="message-sender"><%= message.nickname || message.username %></div>
+            <!-- 상대방 메시지: 닉네임 표시 (세션 또는 기본값) -->
+            <div class="message-sender"><%= @nicknames[message.username] || message.username %></div>
           <% end %>
           <div class="message-content-wrapper">
             <div class="message-content">

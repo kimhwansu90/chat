@@ -24,6 +24,7 @@ module Chat
     # 한국 시간대 설정 (KST, UTC+9)
     config.time_zone = "Asia/Seoul"
     config.active_record.default_timezone = :local
+
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
