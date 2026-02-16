@@ -9,6 +9,10 @@ Rails.application.routes.draw do
   post   "login",  to: "sessions#create"   # 로그인 처리
   delete "logout", to: "sessions#destroy"  # 로그아웃 처리
   
+  # 닉네임 설정
+  get    "nickname", to: "sessions#nickname_form"  # 닉네임 입력 페이지
+  post   "nickname", to: "sessions#set_nickname"   # 닉네임 저장
+  
   # 채팅 페이지
   get "chat", to: "chat#index"             # 채팅 메인 페이지
   

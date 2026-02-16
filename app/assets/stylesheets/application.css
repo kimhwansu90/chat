@@ -367,6 +367,15 @@ body {
   }
 }
 
+/* 메시지 발신자 (닉네임) */
+.message-sender {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+  margin-bottom: 4px;
+  margin-left: 4px;
+}
+
 /* 메시지 버블 래퍼 */
 .message-bubble-wrapper {
   display: flex;

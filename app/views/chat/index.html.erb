@@ -13,7 +13,7 @@
     </div>
     
     <div class="header-right">
-      <span class="current-user"><%= current_user %></span>
+      <span class="current-user"><%= current_nickname %></span>
       <%= button_to "로그아웃", logout_path, method: :delete, class: "btn-logout" %>
     </div>
   </div>
@@ -43,6 +43,10 @@
       <!-- 메시지 -->
       <div class="message <%= 'message-mine' if message.username == current_user %>" data-message-id="<%= message.id %>" data-date="<%= current_date %>">
         <div class="message-bubble-wrapper">
+          <% unless message.username == current_user %>
+            <!-- 상대방 메시지: 닉네임 표시 -->
+            <div class="message-sender"><%= message.nickname || message.username %></div>
+          <% end %>
           <div class="message-content-wrapper">
             <div class="message-content">
               <%= message.content %>
@@ -50,13 +54,9 @@
           </div>
           <div class="message-info">
             <% if message.username == current_user %>
-              <!-- 내가 보낸 메시지: 읽음 표시 + 시간 -->
-              <span class="read-status" data-read-count="<%= message.read_count_except_sender %>">
-                <% if message.read_count_except_sender == 0 %>
-                  <span class="checkmark single">✓</span>
-                <% else %>
-                  <span class="checkmark double">✓✓</span>
-                <% end %>
+              <!-- 내가 보낸 메시지: 읽음 표시 + 시간 (항상 단일 체크) -->
+              <span class="read-status" data-read-count="1">
+                <span class="checkmark single">✓</span>
               </span>
             <% end %>
             <span class="message-time"><%= message.created_at.strftime("%H:%M") %></span>

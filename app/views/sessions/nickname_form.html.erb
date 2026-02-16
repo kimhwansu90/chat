@@ -1,0 +1,30 @@
+<div class="login-container">
+  <div class="login-box">
+    <div class="login-header">
+      <div class="app-logo">
+        <span class="star-icon">⭐</span>
+      </div>
+      <h1 class="app-title">별라채팅</h1>
+      <p class="app-subtitle">닉네임 설정</p>
+    </div>
+    
+    <%= form_with url: nickname_path, method: :post, class: "login-form" do |f| %>
+      <div class="form-group">
+        <%= f.text_field :nickname, 
+            placeholder: "닉네임 (한글 가능)", 
+            class: "form-input",
+            required: true,
+            autofocus: true,
+            maxlength: 20 %>
+      </div>
+      
+      <div class="form-group">
+        <%= f.submit "시작하기", class: "btn-login" %>
+      </div>
+    <% end %>
+    
+    <div class="login-footer">
+      <p class="info-text">채팅에 표시될 닉네임을 입력하세요</p>
+    </div>
+  </div>
+</div>

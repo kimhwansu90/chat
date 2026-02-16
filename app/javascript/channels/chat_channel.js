@@ -95,6 +95,9 @@ consumer.subscriptions.create("ChatChannel", {
     messageDiv.setAttribute("data-message-id", data.id);
     messageDiv.setAttribute("data-date", today);
     
+    // 닉네임 표시 HTML (상대방 메시지에만 표시)
+    const nicknameHtml = !isMine ? `<div class="message-sender">${this.escapeHtml(data.nickname || data.username)}</div>` : '';
+    
     // 읽음 표시 HTML (내가 보낸 메시지에만 표시)
     const readStatusHtml = isMine ? `
       <span class="read-status" data-read-count="${data.read_count || 1}">
@@ -104,6 +107,7 @@ consumer.subscriptions.create("ChatChannel", {
     
     messageDiv.innerHTML = `
       <div class="message-bubble-wrapper">
+        ${nicknameHtml}
         <div class="message-content-wrapper">
           <div class="message-content">
             ${this.escapeHtml(data.content)}
