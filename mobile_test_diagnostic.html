@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>별라채팅 모바일 진단 도구</title>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .diagnostic-box {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #667eea;
+      margin-top: 0;
+    }
+    .test-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    .result {
+      background: #f9fafb;
+      border-left: 4px solid #667eea;
+      padding: 12px;
+      margin: 10px 0;
+      font-family: monospace;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+    .success { border-left-color: #10b981; }
+    .error { border-left-color: #ef4444; }
+    .warning { border-left-color: #f59e0b; }
+  </style>
+</head>
+<body>
+  <h1>⭐ 별라채팅 모바일 진단 도구</h1>
+  
+  <div class="diagnostic-box">
+    <h2>1. 환경 정보</h2>
+    <div id="env-info"></div>
+  </div>
+  
+  <div class="diagnostic-box">
+    <h2>2. 빠른 테스트</h2>
+    <button class="test-button" onclick="openTestSite()">🌐 테스트 사이트 열기</button>
+    <button class="test-button" onclick="copyDiagnosticScript()">📋 진단 스크립트 복사</button>
+  </div>
+  
+  <div class="diagnostic-box">
+    <h2>3. 진단 스크립트 (사이트에서 실행)</h2>
+    <p>아래 스크립트를 복사하여 실제 채팅 페이지의 콘솔에서 실행하세요:</p>
+    <div class="result">
+<textarea id="diagnostic-script" readonly style="width: 100%; height: 300px; font-family: monospace; font-size: 12px;">
+// 별라채팅 모바일 진단 스크립트
+console.log("🔍 === 별라채팅 모바일 진단 시작 ===");
+
+// 1. 환경 정보
+console.log("\n📱 1. 환경 정보:");
+console.log("User Agent:", navigator.userAgent);
+console.log("화면 크기:", window.innerWidth + "x" + window.innerHeight);
+console.log("Device Pixel Ratio:", window.devicePixelRatio);
+console.log("Touch 지원:", 'ontouchstart' in window);
+
+// 2. 필수 요소 확인
+console.log("\n🔍 2. 필수 요소 확인:");
+const messageInput = document.getElementById("message-input");
+const sendButton = document.getElementById("send-button");
+const emojiButton = document.getElementById("emoji-button");
+const messagesContainer = document.getElementById("messages");
+
+console.log("message-input:", messageInput ? "✅ 존재" : "❌ 없음");
+console.log("send-button:", sendButton ? "✅ 존재" : "❌ 없음");
+console.log("emoji-button:", emojiButton ? "✅ 존재" : "❌ 없음");
+console.log("messages:", messagesContainer ? "✅ 존재" : "❌ 없음");
+
+// 3. 전송 버튼 스타일 확인
+if (sendButton) {
+  console.log("\n🎨 3. 전송 버튼 스타일:");
+  const styles = window.getComputedStyle(sendButton);
+  console.log("display:", styles.display);
+  console.log("visibility:", styles.visibility);
+  console.log("opacity:", styles.opacity);
+  console.log("width:", styles.width);
+  console.log("height:", styles.height);
+  console.log("position:", styles.position);
+  console.log("z-index:", styles.zIndex);
+  console.log("background:", styles.background);
+  console.log("pointer-events:", styles.pointerEvents);
+  
+  // 버튼 위치
+  const rect = sendButton.getBoundingClientRect();
+  console.log("\n📍 버튼 위치:");
+  console.log("top:", rect.top);
+  console.log("left:", rect.left);
+  console.log("right:", rect.right);
+  console.log("bottom:", rect.bottom);
+  console.log("화면 내 위치:", rect.top >= 0 && rect.bottom <= window.innerHeight ? "✅ 화면 안" : "⚠️ 화면 밖");
+}
+
+// 4. 입력 컨테이너 확인
+const inputContainer = document.querySelector(".message-input-container");
+if (inputContainer) {
+  console.log("\n📦 4. 입력 컨테이너:");
+  const styles = window.getComputedStyle(inputContainer);
+  console.log("position:", styles.position);
+  console.log("bottom:", styles.bottom);
+  console.log("z-index:", styles.zIndex);
+  console.log("width:", styles.width);
+}
+
+// 5. 이벤트 리스너 확인
+console.log("\n👆 5. 이벤트 리스너 테스트:");
+if (sendButton) {
+  console.log("전송 버튼을 클릭하면 콘솔에 메시지가 나타나야 합니다.");
+  console.log("예상 메시지: '👆 터치 전송' 또는 '🖱️ 클릭 전송'");
+}
+
+// 6. CSS 미디어 쿼리 확인
+console.log("\n📱 6. 미디어 쿼리:");
+const isMobile = window.matchMedia("(max-width: 768px)").matches;
+console.log("모바일 모드:", isMobile ? "✅ 활성화" : "❌ 비활성화");
+
+// 7. 터치 이벤트 테스트
+if (sendButton) {
+  console.log("\n🧪 7. 터치 이벤트 테스트 설정:");
+  let testTouchHandled = false;
+  
+  sendButton.addEventListener("touchstart", function(e) {
+    console.log("✅ touchstart 이벤트 발생");
+  }, { passive: true });
+  
+  sendButton.addEventListener("touchend", function(e) {
+    console.log("✅ touchend 이벤트 발생");
+  }, { passive: true });
+  
+  sendButton.addEventListener("click", function(e) {
+    console.log("✅ click 이벤트 발생");
+  }, { passive: true });
+  
+  console.log("이제 전송 버튼을 탭/클릭해보세요!");
+}
+
+console.log("\n✅ === 진단 완료 ===");
+console.log("위 정보를 개발자에게 전달해주세요.");
+</textarea>
+    </div>
+    <button class="test-button" onclick="copyDiagnosticScript()">📋 스크립트 복사</button>
+  </div>
+  
+  <div class="diagnostic-box">
+    <h2>4. 테스트 절차</h2>
+    <ol style="line-height: 2;">
+      <li><strong>Chrome 개발자 도구 열기</strong>: F12 또는 Ctrl+Shift+I</li>
+      <li><strong>모바일 모드 활성화</strong>: Ctrl+Shift+M 또는 Device Toolbar 아이콘 클릭</li>
+      <li><strong>iPhone 선택</strong>: 상단 드롭다운에서 "iPhone 12 Pro" 또는 "iPhone SE" 선택</li>
+      <li><strong>사이트 접속</strong>: <code>https://lynn-overpowering-yulanda.ngrok-free.dev</code></li>
+      <li><strong>ngrok 화면</strong>: "Visit Site" 버튼 클릭</li>
+      <li><strong>로그인</strong>: 아이디 "관리자", 비밀번호 "7359"</li>
+      <li><strong>콘솔 탭 열기</strong>: Console 탭으로 이동</li>
+      <li><strong>진단 스크립트 실행</strong>: 위의 스크립트를 복사하여 콘솔에 붙여넣고 Enter</li>
+      <li><strong>결과 확인</strong>: 콘솔에 출력된 정보 확인</li>
+      <li><strong>전송 버튼 테스트</strong>: 입력창에 "모바일테스트123" 입력 후 전송 버튼 클릭</li>
+    </ol>
+  </div>
+  
+  <div class="diagnostic-box">
+    <h2>5. 체크리스트</h2>
+    <div class="result">
+□ 전송 버튼이 화면에 보이는가?
+□ 전송 버튼이 파란색/보라색 그라데이션인가?
+□ 전송 버튼이 동그란 모양인가?
+□ 전송 버튼이 화면 우측 하단에 있는가?
+□ 전송 버튼을 클릭하면 반응이 있는가?
+□ 콘솔에 "채팅 초기화 완료" 메시지가 있는가?
+□ 전송 버튼 클릭 시 "터치 전송" 또는 "클릭 전송" 메시지가 나오는가?
+□ 메시지가 실제로 전송되는가?
+□ 콘솔에 에러가 있는가?
+    </div>
+  </div>
+
+  <script>
+    // 환경 정보 표시
+    window.onload = function() {
+      const envInfo = document.getElementById('env-info');
+      envInfo.innerHTML = `
+        <div class="result">
+User Agent: ${navigator.userAgent}
+화면 크기: ${window.innerWidth} x ${window.innerHeight}
+Device Pixel Ratio: ${window.devicePixelRatio}
+Touch 지원: ${'ontouchstart' in window ? '✅ 지원' : '❌ 미지원'}
+Platform: ${navigator.platform}
+        </div>
+      `;
+    };
+    
+    function openTestSite() {
+      window.open('https://lynn-overpowering-yulanda.ngrok-free.dev', '_blank');
+    }
+    
+    function copyDiagnosticScript() {
+      const script = document.getElementById('diagnostic-script');
+      script.select();
+      document.execCommand('copy');
+      alert('✅ 진단 스크립트가 클립보드에 복사되었습니다!\n\n채팅 페이지의 콘솔(F12)에 붙여넣고 실행하세요.');
+    }
+  </script>
+</body>
+</html>

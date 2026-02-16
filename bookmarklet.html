@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>별라채팅 진단 북마클릿</title>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      color: #667eea;
+      margin-top: 0;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    h2 {
+      color: #764ba2;
+      font-size: 20px;
+      margin-top: 32px;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+    .bookmarklet-box {
+      background: #f9fafb;
+      border: 2px dashed #667eea;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .bookmarklet-link {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 18px;
+      margin: 10px;
+      cursor: move;
+      transition: transform 0.2s;
+    }
+    .bookmarklet-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+    .instruction {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 16px;
+      margin: 16px 0;
+      border-radius: 8px;
+    }
+    .code-box {
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .step {
+      background: #f0fdf4;
+      border-left: 4px solid #10b981;
+      padding: 12px 16px;
+      margin: 12px 0;
+      border-radius: 4px;
+    }
+    .step strong {
+      color: #10b981;
+    }
+    .button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      margin: 8px 4px;
+      transition: all 0.2s;
+    }
+    .button:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+    }
+    .emoji {
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><span class="emoji">⭐</span> 별라채팅 진단 북마클릿</h1>
+    
+    <p>이 북마클릿을 사용하면 별라채팅 페이지에서 원클릭으로 진단을 실행할 수 있습니다.</p>
+    
+    <h2>📌 북마클릿 설치 방법</h2>
+    
+    <div class="instruction">
+      <strong>⚠️ 중요:</strong> 아래 버튼을 <strong>북마크바로 드래그</strong>하세요! (클릭하지 마세요)
+    </div>
+    
+    <div class="bookmarklet-box">
+      <p style="margin-bottom: 16px; color: #6b7280;">이 버튼을 북마크바로 드래그 앤 드롭:</p>
+      <a href="javascript:(function(){console.log('%c🔍 별라채팅 모바일 진단 시작','font-size:16px;font-weight:bold;color:%23667eea');console.log('%c📱 1. 환경 정보','font-size:14px;font-weight:bold;color:%23764ba2');console.log('User Agent:',navigator.userAgent);console.log('화면 크기:',window.innerWidth+'x'+window.innerHeight);console.log('Device Pixel Ratio:',window.devicePixelRatio);console.log('Touch 지원:','ontouchstart'in window);const messageInput=document.getElementById('message-input');const sendButton=document.getElementById('send-button');const emojiButton=document.getElementById('emoji-button');const messagesContainer=document.getElementById('messages');console.log('%c🔍 2. 필수 요소 확인','font-size:14px;font-weight:bold;color:%23764ba2');console.log('message-input:',messageInput?'✅ 존재':'❌ 없음');console.log('send-button:',sendButton?'✅ 존재':'❌ 없음');console.log('emoji-button:',emojiButton?'✅ 존재':'❌ 없음');console.log('messages:',messagesContainer?'✅ 존재':'❌ 없음');if(sendButton){console.log('%c🎨 3. 전송 버튼 스타일','font-size:14px;font-weight:bold;color:%23764ba2');const styles=window.getComputedStyle(sendButton);console.log('display:',styles.display);console.log('visibility:',styles.visibility);console.log('opacity:',styles.opacity);console.log('width:',styles.width);console.log('height:',styles.height);console.log('position:',styles.position);console.log('z-index:',styles.zIndex);console.log('background:',styles.background);console.log('pointer-events:',styles.pointerEvents);const rect=sendButton.getBoundingClientRect();console.log('%c📍 버튼 위치','font-size:14px;font-weight:bold;color:%23764ba2');console.log('top:',rect.top);console.log('left:',rect.left);console.log('right:',rect.right);console.log('bottom:',rect.bottom);console.log('화면 내 위치:',rect.top>=0&&rect.bottom<=window.innerHeight?'✅ 화면 안':'⚠️ 화면 밖');}const inputContainer=document.querySelector('.message-input-container');if(inputContainer){console.log('%c📦 4. 입력 컨테이너','font-size:14px;font-weight:bold;color:%23764ba2');const styles=window.getComputedStyle(inputContainer);console.log('position:',styles.position);console.log('bottom:',styles.bottom);console.log('z-index:',styles.zIndex);console.log('width:',styles.width);}console.log('%c📱 5. 미디어 쿼리','font-size:14px;font-weight:bold;color:%23764ba2');const isMobile=window.matchMedia('(max-width: 768px)').matches;console.log('모바일 모드:',isMobile?'✅ 활성화':'❌ 비활성화');console.log('%c✅ 진단 완료!','font-size:16px;font-weight:bold;color:%2310b981');console.log('이제 전송 버튼을 클릭해보세요. 콘솔에 \"터치 전송\" 또는 \"클릭 전송\" 메시지가 나타나야 합니다.');})();" class="bookmarklet-link">🔍 별라채팅 진단</a>
+    </div>
+    
+    <div class="step">
+      <strong>Step 1:</strong> 위의 "🔍 별라채팅 진단" 버튼을 마우스로 클릭한 채로 잡으세요
+    </div>
+    
+    <div class="step">
+      <strong>Step 2:</strong> 북마크바(즐겨찾기 바)로 드래그하세요
+    </div>
+    
+    <div class="step">
+      <strong>Step 3:</strong> 별라채팅 페이지에서 북마크를 클릭하면 자동으로 진단이 실행됩니다
+    </div>
+    
+    <h2>🚀 사용 방법</h2>
+    
+    <ol style="line-height: 2;">
+      <li>Chrome에서 <strong>북마크바 표시</strong> (Ctrl+Shift+B)</li>
+      <li>위의 버튼을 북마크바로 드래그</li>
+      <li><code>https://lynn-overpowering-yulanda.ngrok-free.dev</code> 접속</li>
+      <li>로그인 (관리자 / 7359)</li>
+      <li><strong>F12</strong>로 개발자 도구 열기</li>
+      <li><strong>Console 탭</strong> 선택</li>
+      <li>북마크바의 <strong>"🔍 별라채팅 진단"</strong> 클릭</li>
+      <li>콘솔에 출력된 진단 결과 확인</li>
+    </ol>
+    
+    <h2>📋 진단 항목</h2>
+    
+    <ul style="line-height: 2;">
+      <li>✅ 환경 정보 (User Agent, 화면 크기, Touch 지원)</li>
+      <li>✅ 필수 요소 존재 확인 (입력창, 전송 버튼, 이모티콘 버튼)</li>
+      <li>✅ 전송 버튼 스타일 (크기, 위치, 가시성)</li>
+      <li>✅ 입력 컨테이너 위치 (fixed, bottom, z-index)</li>
+      <li>✅ 모바일 미디어 쿼리 활성화 여부</li>
+    </ul>
+    
+    <h2>🔧 수동 설치 (드래그가 안 되는 경우)</h2>
+    
+    <div class="instruction">
+      북마크바에 새 북마크를 만들고 아래 코드를 URL 필드에 붙여넣으세요:
+    </div>
+    
+    <div class="code-box" id="bookmarklet-code">
+javascript:(function(){console.log('%c🔍 별라채팅 모바일 진단 시작','font-size:16px;font-weight:bold;color:%23667eea');console.log('%c📱 1. 환경 정보','font-size:14px;font-weight:bold;color:%23764ba2');console.log('User Agent:',navigator.userAgent);console.log('화면 크기:',window.innerWidth+'x'+window.innerHeight);console.log('Device Pixel Ratio:',window.devicePixelRatio);console.log('Touch 지원:','ontouchstart'in window);const messageInput=document.getElementById('message-input');const sendButton=document.getElementById('send-button');const emojiButton=document.getElementById('emoji-button');const messagesContainer=document.getElementById('messages');console.log('%c🔍 2. 필수 요소 확인','font-size:14px;font-weight:bold;color:%23764ba2');console.log('message-input:',messageInput?'✅ 존재':'❌ 없음');console.log('send-button:',sendButton?'✅ 존재':'❌ 없음');console.log('emoji-button:',emojiButton?'✅ 존재':'❌ 없음');console.log('messages:',messagesContainer?'✅ 존재':'❌ 없음');if(sendButton){console.log('%c🎨 3. 전송 버튼 스타일','font-size:14px;font-weight:bold;color:%23764ba2');const styles=window.getComputedStyle(sendButton);console.log('display:',styles.display);console.log('visibility:',styles.visibility);console.log('opacity:',styles.opacity);console.log('width:',styles.width);console.log('height:',styles.height);console.log('position:',styles.position);console.log('z-index:',styles.zIndex);console.log('background:',styles.background);console.log('pointer-events:',styles.pointerEvents);const rect=sendButton.getBoundingClientRect();console.log('%c📍 버튼 위치','font-size:14px;font-weight:bold;color:%23764ba2');console.log('top:',rect.top);console.log('left:',rect.left);console.log('right:',rect.right);console.log('bottom:',rect.bottom);console.log('화면 내 위치:',rect.top>=0&&rect.bottom<=window.innerHeight?'✅ 화면 안':'⚠️ 화면 밖');}const inputContainer=document.querySelector('.message-input-container');if(inputContainer){console.log('%c📦 4. 입력 컨테이너','font-size:14px;font-weight:bold;color:%23764ba2');const styles=window.getComputedStyle(inputContainer);console.log('position:',styles.position);console.log('bottom:',styles.bottom);console.log('z-index:',styles.zIndex);console.log('width:',styles.width);}console.log('%c📱 5. 미디어 쿼리','font-size:14px;font-weight:bold;color:%23764ba2');const isMobile=window.matchMedia('(max-width: 768px)').matches;console.log('모바일 모드:',isMobile?'✅ 활성화':'❌ 비활성화');console.log('%c✅ 진단 완료!','font-size:16px;font-weight:bold;color:%2310b981');console.log('이제 전송 버튼을 클릭해보세요. 콘솔에 "터치 전송" 또는 "클릭 전송" 메시지가 나타나야 합니다.');})();
+    </div>
+    
+    <button class="button" onclick="copyBookmarkletCode()">📋 코드 복사</button>
+    
+    <h2>💡 팁</h2>
+    
+    <ul style="line-height: 2;">
+      <li><strong>모바일 모드 테스트:</strong> Chrome DevTools에서 Ctrl+Shift+M으로 모바일 모드 활성화</li>
+      <li><strong>iPhone 시뮬레이션:</strong> 디바이스 드롭다운에서 "iPhone 12 Pro" 선택</li>
+      <li><strong>콘솔 단축키:</strong> F12 또는 Ctrl+Shift+I (Mac: Cmd+Option+I)</li>
+      <li><strong>콘솔 클리어:</strong> 콘솔에서 clear() 입력 또는 Ctrl+L</li>
+    </ul>
+    
+    <h2>🐛 문제 해결</h2>
+    
+    <div class="instruction">
+      <strong>북마클릿이 작동하지 않는 경우:</strong>
+      <ol style="margin: 8px 0 0 20px;">
+        <li>북마크 URL이 <code>javascript:</code>로 시작하는지 확인</li>
+        <li>코드가 한 줄로 되어 있는지 확인 (줄바꿈 없음)</li>
+        <li>브라우저를 재시작하고 다시 시도</li>
+        <li>수동으로 콘솔에 코드를 붙여넣어 실행 (<code>javascript:</code> 제외)</li>
+      </ol>
+    </div>
+    
+    <hr style="margin: 32px 0; border: none; border-top: 2px solid #e5e7eb;">
+    
+    <p style="text-align: center; color: #6b7280; font-size: 14px;">
+      <strong>별라채팅 (⭐ Star Chat)</strong><br>
+      모바일 진단 도구 v1.0 | 2026-02-17
+    </p>
+  </div>
+  
+  <script>
+    function copyBookmarkletCode() {
+      const code = document.getElementById('bookmarklet-code').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('✅ 북마클릿 코드가 복사되었습니다!\n\n북마크 추가 → URL 필드에 붙여넣기');
+      }).catch(err => {
+        console.error('복사 실패:', err);
+        alert('❌ 복사에 실패했습니다. 수동으로 선택하여 복사해주세요.');
+      });
+    }
+  </script>
+</body>
+</html>
