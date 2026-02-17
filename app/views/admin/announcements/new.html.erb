@@ -1,0 +1,17 @@
+<div class="admin-page">
+  <h1 class="admin-page-title">공지 전송</h1>
+
+  <div class="admin-form-card">
+    <%= form_tag admin_announcement_path, method: :post, class: "admin-form" do %>
+      <div class="admin-form-group">
+        <label for="content" class="admin-label">공지 내용</label>
+        <textarea name="content" id="content" rows="4" class="admin-textarea" placeholder="채팅방에 표시될 공지 내용을 입력하세요..." required></textarea>
+      </div>
+
+      <div class="admin-form-actions">
+        <button type="submit" class="admin-btn admin-btn-primary">공지 전송</button>
+        <a href="/admin" class="admin-btn admin-btn-secondary">취소</a>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>별라채팅 관리자</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  </head>
+
+  <body class="admin-body">
+    <div class="admin-layout">
+      <!-- 사이드바 -->
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+          <span class="star-icon">⭐</span>
+          <h2>관리자 패널</h2>
+        </div>
+        <nav class="admin-nav">
+          <a href="/admin" class="admin-nav-item <%= 'active' if controller_name == 'dashboard' %>">
+            <span>📊</span> 대시보드
+          </a>
+          <a href="/admin/users" class="admin-nav-item <%= 'active' if controller_name == 'users' %>">
+            <span>👥</span> 사용자 관리
+          </a>
+          <a href="/admin/messages" class="admin-nav-item <%= 'active' if controller_name == 'messages' %>">
+            <span>💬</span> 채팅 모니터링
+          </a>
+          <a href="/admin/announcement/new" class="admin-nav-item <%= 'active' if controller_name == 'announcements' %>">
+            <span>📢</span> 공지 전송
+          </a>
+          <a href="/admin/reports" class="admin-nav-item <%= 'active' if controller_name == 'reports' %>">
+            <span>🚨</span> 신고 관리
+            <% pending_count = Report.pending.count %>
+            <% if pending_count > 0 %>
+              <span class="admin-badge" id="report-badge"><%= pending_count %></span>
+            <% end %>
+          </a>
+        </nav>
+        <div class="admin-sidebar-footer">
+          <a href="/chat" class="admin-nav-item">
+            <span>💬</span> 채팅으로 돌아가기
+          </a>
+          <%= button_to "로그아웃", logout_path, method: :delete, class: "admin-logout-btn" %>
+        </div>
+      </aside>
+
+      <!-- 메인 콘텐츠 -->
+      <main class="admin-main">
+        <% if notice.present? %>
+          <div class="flash-notice"><%= notice %></div>
+        <% end %>
+        <% if alert.present? %>
+          <div class="flash-alert"><%= alert %></div>
+        <% end %>
+
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+</html>

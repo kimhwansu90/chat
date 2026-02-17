@@ -1,0 +1,37 @@
+<div class="admin-page">
+  <h1 class="admin-page-title">채팅 모니터링</h1>
+
+  <div class="admin-table-wrapper">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>시간</th>
+          <th>발신자</th>
+          <th>유형</th>
+          <th>내용</th>
+          <th>관리</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @messages.each do |msg| %>
+          <tr>
+            <td><%= msg.id %></td>
+            <td><%= msg.created_at.strftime("%m/%d %H:%M:%S") %></td>
+            <td><%= @nicknames[msg.username] || msg.username %></td>
+            <td><span class="admin-tag admin-tag-<%= msg.message_type %>"><%= msg.message_type %></span></td>
+            <td class="admin-msg-content">
+              <% if msg.image.attached? %>
+                <span class="admin-tag admin-tag-image">[이미지]</span>
+              <% end %>
+              <%= truncate(msg.content || "", length: 80) %>
+            </td>
+            <td>
+              <%= button_to "삭제", admin_message_path(msg), method: :delete, class: "admin-btn admin-btn-danger admin-btn-sm", data: { turbo_confirm: "이 메시지를 삭제하시겠습니까?" } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

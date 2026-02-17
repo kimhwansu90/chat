@@ -24,10 +24,20 @@ class SessionsController < ApplicationController
       # DB에서 유저 찾거나 생성
       user = User.find_or_create_by(username: username)
 
+      # 차단된 사용자 로그인 거부
+      if user.banned?
+        flash.now[:alert] = "차단된 계정입니다. 사유: #{user.banned_reason || '관리자에 의한 차단'}"
+        render :new, status: :unprocessable_entity
+        return
+      end
+
       # DB에 닉네임이 없으면 기본 닉네임 저장
       if user.nickname.blank?
         user.update(nickname: user_info[:nickname])
       end
+
+      # admin 유저는 role 설정
+      user.update(role: "admin") if username == "admin" && user.role != "admin"
 
       # 세션에 사용자 이름과 닉네임 저장
       session[:username] = username

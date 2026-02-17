@@ -1,0 +1,54 @@
+<div class="admin-page">
+  <h1 class="admin-page-title">신고 관리</h1>
+
+  <div class="admin-table-wrapper">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>신고일</th>
+          <th>신고자</th>
+          <th>피신고자</th>
+          <th>유형</th>
+          <th>사유</th>
+          <th>메시지 내용</th>
+          <th>상태</th>
+          <th>관리</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @reports.each do |report| %>
+          <tr class="<%= 'report-pending' if report.status == 'pending' %>">
+            <td><%= report.id %></td>
+            <td><%= report.created_at.strftime("%m/%d %H:%M") %></td>
+            <td><%= report.reporter_username %></td>
+            <td><%= report.reported_username %></td>
+            <td><span class="admin-tag"><%= report.report_type %></span></td>
+            <td><%= report.reason %></td>
+            <td class="admin-msg-content"><%= truncate(report.message&.content || "[삭제됨]", length: 50) %></td>
+            <td>
+              <span class="admin-tag admin-tag-<%= report.status %>"><%= report.status %></span>
+              <% if report.reviewed_by.present? %>
+                <br><small>처리: <%= report.reviewed_by %></small>
+              <% end %>
+            </td>
+            <td class="admin-actions">
+              <% if report.status == "pending" %>
+                <%= button_to "처리", review_admin_report_path(report), method: :post, class: "admin-btn admin-btn-success admin-btn-sm" %>
+                <%= button_to "기각", dismiss_admin_report_path(report), method: :post, class: "admin-btn admin-btn-secondary admin-btn-sm" %>
+              <% else %>
+                <span class="admin-tag">처리완료</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if @reports.empty? %>
+          <tr>
+            <td colspan="9" class="admin-empty">신고 내역이 없습니다.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

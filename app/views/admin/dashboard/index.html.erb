@@ -1,0 +1,81 @@
+<div class="admin-page">
+  <h1 class="admin-page-title">대시보드</h1>
+
+  <!-- 통계 카드 -->
+  <div class="admin-stats">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= @total_users %></div>
+        <div class="stat-label">전체 사용자</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💬</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= @today_messages %></div>
+        <div class="stat-label">오늘 메시지</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🟢</div>
+      <div class="stat-info">
+        <div class="stat-value" id="online-count"><%= @online_users.size %></div>
+        <div class="stat-label">접속자</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🚨</div>
+      <div class="stat-info">
+        <div class="stat-value" id="pending-reports"><%= @pending_reports %></div>
+        <div class="stat-label">미처리 신고</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 실시간 접속자 -->
+  <div class="admin-section">
+    <h2 class="admin-section-title">실시간 접속자</h2>
+    <div class="admin-online-users" id="online-users-list">
+      <% if @online_users.any? %>
+        <% @online_users.each do |username| %>
+          <span class="online-user-tag"><%= @nicknames[username] || username %> (<%= username %>)</span>
+        <% end %>
+      <% else %>
+        <p class="admin-empty">접속자가 없습니다.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- 최근 메시지 -->
+  <div class="admin-section">
+    <h2 class="admin-section-title">최근 메시지</h2>
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>시간</th>
+            <th>발신자</th>
+            <th>내용</th>
+            <th>유형</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_messages.each do |msg| %>
+            <tr>
+              <td><%= msg.created_at.strftime("%m/%d %H:%M") %></td>
+              <td><%= @nicknames[msg.username] || msg.username %></td>
+              <td class="admin-msg-content">
+                <% if msg.image.attached? %>
+                  [이미지]
+                <% end %>
+                <%= truncate(msg.content || "", length: 50) %>
+              </td>
+              <td><span class="admin-tag admin-tag-<%= msg.message_type %>"><%= msg.message_type %></span></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

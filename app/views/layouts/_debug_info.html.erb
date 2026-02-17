@@ -1,0 +1,8 @@
+<!-- 디버그 정보 (개발 환경에서만 표시) -->
+<% if Rails.env.development? %>
+<div style="position: fixed; bottom: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; font-size: 12px; z-index: 9999;">
+  <div>Username: <%= current_user %></div>
+  <div>Nickname: <%= current_nickname %></div>
+  <div>Session ID: <%= session.id %></div>
+</div>
+<% end %>

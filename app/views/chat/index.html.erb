@@ -11,26 +11,26 @@
         <span class="online-status">● 온라인</span>
       </div>
     </div>
-    
+
     <div class="header-right">
       <span class="current-user"><%= current_nickname %></span>
+      <% if current_user == "admin" %>
+        <a href="/admin" class="btn-admin" title="관리자 패널">관리</a>
+      <% end %>
       <%= button_to "로그아웃", logout_path, method: :delete, class: "btn-logout" %>
     </div>
   </div>
-  
+
   <!-- 메시지 영역 -->
   <div class="messages-container" id="messages">
-    <% 
-      # 요일 계산용
+    <%
       weekdays = ['일', '월', '화', '수', '목', '금', '토']
-      # 이전 날짜 추적 (날짜가 바뀔 때마다 구분선 표시)
       previous_date = nil
     %>
-    
+
     <% @messages.each do |message| %>
       <% current_date = message.created_at.to_date %>
-      
-      <!-- 날짜가 바뀌면 날짜 구분선 표시 (카카오톡 스타일) -->
+
       <% if previous_date.nil? || previous_date != current_date %>
         <div class="date-divider" data-date="<%= current_date %>">
           <span class="date-divider-text">
@@ -39,69 +39,102 @@
         </div>
         <% previous_date = current_date %>
       <% end %>
-      
-      <!-- 메시지 -->
-      <div class="message <%= 'message-mine' if message.username == current_user %>" data-message-id="<%= message.id %>" data-date="<%= current_date %>">
-        <div class="message-bubble-wrapper">
-          <% unless message.username == current_user %>
-            <!-- 상대방 메시지: 닉네임 표시 (세션 또는 기본값) -->
-            <div class="message-sender"><%= @nicknames[message.username] || message.nickname || message.username %></div>
-          <% end %>
-          <div class="message-content-wrapper">
-            <div class="message-content">
-              <%= message.content %>
+
+      <% if message.message_type == "system" %>
+        <!-- 시스템 메시지 (공지) -->
+        <div class="system-message" data-message-id="<%= message.id %>">
+          <span class="system-message-text"><%= message.content %></span>
+        </div>
+      <% else %>
+        <!-- 메시지 -->
+        <div class="message <%= 'message-mine' if message.username == current_user %>" data-message-id="<%= message.id %>" data-date="<%= current_date %>">
+          <div class="message-bubble-wrapper">
+            <% unless message.username == current_user %>
+              <div class="message-sender"><%= @nicknames[message.username] || message.nickname || message.username %></div>
+            <% end %>
+            <div class="message-content-wrapper">
+              <% if message.image.attached? %>
+                <div class="message-image" onclick="openImageViewer('<%= url_for(message.image) %>')">
+                  <%= image_tag message.image.variant(resize_to_limit: [400, 400]), class: "chat-thumbnail", loading: "lazy" %>
+                </div>
+              <% end %>
+              <% if message.content.present? %>
+                <div class="message-content">
+                  <%= message.content %>
+                </div>
+              <% end %>
+            </div>
+            <div class="message-info">
+              <% unless message.username == current_user %>
+                <button class="btn-report" onclick="reportMessage(<%= message.id %>)" title="신고">⚠️</button>
+              <% end %>
+              <% if message.username == current_user %>
+                <span class="read-status" data-read-count="1">
+                  <span class="checkmark single">✓</span>
+                </span>
+              <% end %>
+              <span class="message-time"><%= message.created_at.strftime("%H:%M") %></span>
             </div>
           </div>
-          <div class="message-info">
-            <% if message.username == current_user %>
-              <!-- 내가 보낸 메시지: 읽음 표시 + 시간 (항상 단일 체크) -->
-              <span class="read-status" data-read-count="1">
-                <span class="checkmark single">✓</span>
-              </span>
-            <% end %>
-            <span class="message-time"><%= message.created_at.strftime("%H:%M") %></span>
-          </div>
         </div>
-      </div>
+      <% end %>
     <% end %>
   </div>
-  
+
+  <!-- 이미지 미리보기 -->
+  <div id="image-preview-bar" class="image-preview-bar" style="display: none;">
+    <img id="image-preview-img" src="" alt="미리보기">
+    <button type="button" id="cancel-image" class="btn-cancel-image" title="취소">✕</button>
+  </div>
+
   <!-- 메시지 입력 영역 -->
-  <div class="message-input-container">
-    <div class="message-form" style="display: grid !important; grid-template-columns: 44px 1fr 44px !important; gap: 8px !important;">
+  <div class="message-input-container" id="message-input-container">
+    <div class="message-form" style="display: grid !important; grid-template-columns: 44px 44px 1fr 44px !important; gap: 8px !important;">
       <!-- 이모티콘 버튼 -->
       <button type="button" id="emoji-button" class="btn-emoji" title="이모티콘">
         😊
       </button>
-      
-      <!-- 메시지 입력창 (모바일 엔터키 지원) -->
-      <input 
-        type="text" 
-        id="message-input" 
-        class="message-input" 
-        placeholder="메시지를 입력하세요..." 
+
+      <!-- 이미지 버튼 -->
+      <button type="button" id="image-button" class="btn-image" title="이미지 전송">
+        📷
+      </button>
+      <input type="file" id="image-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;">
+
+      <!-- 메시지 입력창 -->
+      <input
+        type="text"
+        id="message-input"
+        class="message-input"
+        placeholder="메시지를 입력하세요..."
         autocomplete="off"
         enterkeyhint="send">
-      
+
       <!-- 전송 버튼 -->
       <button type="button" class="btn-send" id="send-button" title="전송" style="width: 44px !important; height: 44px !important; display: flex !important; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; border-radius: 50% !important; border: none !important;">
-        <!-- 전송 아이콘 -->
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
     </div>
-    
+
     <!-- 이모티콘 피커 -->
     <div id="emoji-picker" class="emoji-picker" style="display: none;">
       <div class="emoji-picker-header">
         <span class="emoji-category">자주 사용</span>
       </div>
       <div class="emoji-grid" id="emoji-grid">
-        <!-- JavaScript로 이모티콘 추가 -->
       </div>
     </div>
+  </div>
+</div>
+
+<!-- 라이트박스 (풀스크린 이미지 뷰어) -->
+<div id="image-lightbox" class="image-lightbox" style="display: none;" onclick="closeImageViewer()">
+  <div class="lightbox-content">
+    <img id="lightbox-img" src="" alt="이미지">
+    <button class="lightbox-close" onclick="closeImageViewer()">✕</button>
   </div>
 </div>
 
