@@ -1,14 +1,25 @@
 import consumer from "channels/consumer"
 
-// 관리자 페이지에서만 구독
-if (document.querySelector(".admin-layout")) {
-  consumer.subscriptions.create("AdminChannel", {
+// Turbo 페이지 이동에 대응하는 구독 관리
+var adminSubscription = null;
+
+function ensureAdminSubscription() {
+  if (!document.querySelector(".admin-layout")) return;
+
+  if (adminSubscription) return;
+
+  adminSubscription = consumer.subscriptions.create("AdminChannel", {
     connected: function() {
-      console.log("관리자 채널에 연결되었습니다");
+      console.log("[ActionCable] AdminChannel connected");
     },
 
     disconnected: function() {
-      console.log("관리자 채널 연결이 끊어졌습니다");
+      console.log("[ActionCable] AdminChannel disconnected");
+    },
+
+    rejected: function() {
+      console.log("[ActionCable] AdminChannel rejected");
+      adminSubscription = null;
     },
 
     received: function(data) {
@@ -46,4 +57,12 @@ if (document.querySelector(".admin-layout")) {
       }
     }
   });
+}
+
+// Turbo 페이지 이동 시 구독 확인
+document.addEventListener("turbo:load", ensureAdminSubscription);
+document.addEventListener("DOMContentLoaded", ensureAdminSubscription);
+
+if (document.readyState !== "loading") {
+  ensureAdminSubscription();
 }
