@@ -80,4 +80,12 @@ Rails.application.configure do
 
   # Railway 동적 호스트네임 허용
   config.hosts.clear
+
+  # Railway HTTPS 프록시 뒤에서 동작 (wss:// 및 secure cookie 지원)
+  config.assume_ssl = true
+  config.force_ssl = false
+
+  # ActionCable: 모든 오리진 허용 (Railway 동적 도메인 대응)
+  config.action_cable.disable_request_forgery_protection = true
+  config.action_cable.allowed_request_origins = [/.*/]
 end

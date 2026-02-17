@@ -1,18 +1,16 @@
 import consumer from "channels/consumer"
 
 consumer.subscriptions.create("ChatChannel", {
-  connected() {
+  connected: function() {
     console.log("채팅 채널에 연결되었습니다");
     this.markUnreadMessages();
   },
 
-  disconnected() {
+  disconnected: function() {
     console.log("채팅 채널 연결이 끊어졌습니다");
   },
 
-  received(data) {
-    console.log("데이터 수신:", data);
-
+  received: function(data) {
     // 읽음 확인
     if (data.type === "read_receipt") {
       this.updateReadStatus(data.message_id, data.read_count);
@@ -30,7 +28,7 @@ consumer.subscriptions.create("ChatChannel", {
 
     // 메시지 삭제
     if (data.type === "message_deleted") {
-      const msgEl = document.querySelector('[data-message-id="' + data.message_id + '"]');
+      var msgEl = document.querySelector('[data-message-id="' + data.message_id + '"]');
       if (msgEl) {
         msgEl.remove();
       }
@@ -38,11 +36,11 @@ consumer.subscriptions.create("ChatChannel", {
     }
 
     // 새 메시지 수신
-    const messagesContainer = document.getElementById("messages");
+    var messagesContainer = document.getElementById("messages");
     if (messagesContainer) {
       this.addDateDividerIfNeeded();
 
-      const messageDiv = this.createMessageElement(data);
+      var messageDiv = this.createMessageElement(data);
       messagesContainer.appendChild(messageDiv);
       this.scrollToBottom();
 
@@ -52,106 +50,114 @@ consumer.subscriptions.create("ChatChannel", {
     }
   },
 
-  addDateDividerIfNeeded() {
-    const messagesContainer = document.getElementById("messages");
-    const messages = messagesContainer.querySelectorAll(".message");
-    const today = new Date();
-    const todayStr = today.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+  addDateDividerIfNeeded: function() {
+    var messagesContainer = document.getElementById("messages");
+    var messages = messagesContainer.querySelectorAll(".message");
+    var today = new Date();
+    var todayStr = today.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric", weekday: "long" });
 
-    const existingDividers = messagesContainer.querySelectorAll(".date-divider");
-    const todayDate = today.toDateString();
-    let hasTodayDivider = false;
+    var existingDividers = messagesContainer.querySelectorAll(".date-divider");
+    var todayDate = today.toDateString();
+    var hasTodayDivider = false;
 
-    existingDividers.forEach(divider => {
+    existingDividers.forEach(function(divider) {
       if (divider.getAttribute("data-date") === todayDate) {
         hasTodayDivider = true;
       }
     });
 
     if (messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      const lastMessageDate = lastMessage.getAttribute("data-date");
+      var lastMessage = messages[messages.length - 1];
+      var lastMessageDate = lastMessage.getAttribute("data-date");
 
       if (lastMessageDate !== todayDate && !hasTodayDivider) {
-        const divider = document.createElement("div");
+        var divider = document.createElement("div");
         divider.className = "date-divider";
         divider.setAttribute("data-date", todayDate);
-        divider.innerHTML = `<span class="date-divider-text">${todayStr}</span>`;
+        divider.innerHTML = '<span class="date-divider-text">' + this.escapeHtml(todayStr) + '</span>';
         messagesContainer.appendChild(divider);
       }
     } else if (!hasTodayDivider) {
-      const divider = document.createElement("div");
+      var divider = document.createElement("div");
       divider.className = "date-divider";
       divider.setAttribute("data-date", todayDate);
-      divider.innerHTML = `<span class="date-divider-text">${todayStr}</span>`;
+      divider.innerHTML = '<span class="date-divider-text">' + this.escapeHtml(todayStr) + '</span>';
       messagesContainer.appendChild(divider);
     }
   },
 
-  createMessageElement(data) {
-    const today = new Date().toDateString();
-    const isMine = data.username === window.currentUser;
+  createMessageElement: function(data) {
+    var today = new Date().toDateString();
+    var isMine = data.username === window.currentUser;
 
     // 시스템 메시지
     if (data.message_type === "system") {
-      const sysDiv = document.createElement("div");
+      var sysDiv = document.createElement("div");
       sysDiv.className = "system-message";
       sysDiv.setAttribute("data-message-id", data.id);
-      sysDiv.innerHTML = `<span class="system-message-text">${this.escapeHtml(data.content)}</span>`;
+      sysDiv.innerHTML = '<span class="system-message-text">' + this.escapeHtml(data.content) + '</span>';
       return sysDiv;
     }
 
-    const messageDiv = document.createElement("div");
+    var messageDiv = document.createElement("div");
     messageDiv.className = isMine ? "message message-mine" : "message";
     messageDiv.setAttribute("data-message-id", data.id);
     messageDiv.setAttribute("data-date", today);
 
-    const nicknameHtml = !isMine ? `<div class="message-sender">${this.escapeHtml(data.nickname || data.username)}</div>` : '';
+    var nicknameHtml = "";
+    if (!isMine) {
+      nicknameHtml = '<div class="message-sender">' + this.escapeHtml(data.nickname || data.username) + '</div>';
+    }
 
-    const readStatusHtml = isMine ? `
-      <span class="read-status" data-read-count="${data.read_count || 1}">
-        ${data.read_count > 1 ? '<span class="checkmark double">✓✓</span>' : '<span class="checkmark single">✓</span>'}
-      </span>
-    ` : '';
+    var readStatusHtml = "";
+    if (isMine) {
+      var readCount = data.read_count || 1;
+      var checkHtml = readCount > 1
+        ? '<span class="checkmark double">✓✓</span>'
+        : '<span class="checkmark single">✓</span>';
+      readStatusHtml = '<span class="read-status" data-read-count="' + readCount + '">' + checkHtml + '</span>';
+    }
 
-    // 신고 버튼 (상대방 메시지에만)
-    const reportBtnHtml = !isMine ? `<button class="btn-report" onclick="reportMessage(${data.id})" title="신고">⚠️</button>` : '';
+    // 신고 버튼
+    var reportBtnHtml = "";
+    if (!isMine) {
+      reportBtnHtml = '<button class="btn-report" onclick="reportMessage(' + data.id + ')" title="신고">⚠️</button>';
+    }
 
-    // 이미지 HTML
-    let imageHtml = '';
+    // 이미지
+    var imageHtml = "";
     if (data.image_url) {
-      const thumbUrl = data.image_thumbnail_url || data.image_url;
-      imageHtml = `<div class="message-image" onclick="openImageViewer('${this.escapeAttr(data.image_url)}')"><img src="${this.escapeAttr(thumbUrl)}" class="chat-thumbnail" loading="lazy"></div>`;
+      var thumbUrl = data.image_thumbnail_url || data.image_url;
+      imageHtml = '<div class="message-image" onclick="openImageViewer(\'' + this.escapeAttr(data.image_url) + '\')"><img src="' + this.escapeAttr(thumbUrl) + '" class="chat-thumbnail" loading="lazy"></div>';
     }
 
-    // 텍스트 HTML
-    let contentHtml = '';
+    // 텍스트
+    var contentHtml = "";
     if (data.content) {
-      contentHtml = `<div class="message-content">${this.escapeHtml(data.content)}</div>`;
+      contentHtml = '<div class="message-content">' + this.escapeHtml(data.content) + '</div>';
     }
 
-    messageDiv.innerHTML = `
-      <div class="message-bubble-wrapper">
-        ${nicknameHtml}
-        <div class="message-content-wrapper">
-          ${imageHtml}
-          ${contentHtml}
-        </div>
-        <div class="message-info">
-          ${reportBtnHtml}
-          ${readStatusHtml}
-          <span class="message-time">${data.created_at}</span>
-        </div>
-      </div>
-    `;
+    messageDiv.innerHTML =
+      '<div class="message-bubble-wrapper">' +
+        nicknameHtml +
+        '<div class="message-content-wrapper">' +
+          imageHtml +
+          contentHtml +
+        '</div>' +
+        '<div class="message-info">' +
+          reportBtnHtml +
+          readStatusHtml +
+          '<span class="message-time">' + data.created_at + '</span>' +
+        '</div>' +
+      '</div>';
 
     return messageDiv;
   },
 
-  updateReadStatus(messageId, readCount) {
-    const messageDiv = document.querySelector(`[data-message-id="${messageId}"]`);
+  updateReadStatus: function(messageId, readCount) {
+    var messageDiv = document.querySelector('[data-message-id="' + messageId + '"]');
     if (messageDiv) {
-      const readStatus = messageDiv.querySelector(".read-status");
+      var readStatus = messageDiv.querySelector(".read-status");
       if (readStatus) {
         readStatus.setAttribute("data-read-count", readCount);
         if (readCount > 1) {
@@ -163,53 +169,49 @@ consumer.subscriptions.create("ChatChannel", {
     }
   },
 
-  markMessageAsRead(messageId) {
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+  markMessageAsRead: function(messageId) {
+    var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    var csrfToken = csrfMeta ? csrfMeta.getAttribute("content") : "";
 
-    fetch("/messages/mark_read", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-Token": csrfToken
-      },
-      body: JSON.stringify({ message_ids: [messageId] })
-    }).catch(error => {
-      console.error("읽음 처리 오류:", error);
-    });
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/messages/mark_read", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("X-CSRF-Token", csrfToken);
+    xhr.send(JSON.stringify({ message_ids: [messageId] }));
   },
 
-  markUnreadMessages() {
-    const messages = document.querySelectorAll(".message:not(.message-mine)");
-    const messageIds = Array.from(messages).map(msg => msg.getAttribute("data-message-id")).filter(id => id);
+  markUnreadMessages: function() {
+    var messages = document.querySelectorAll(".message:not(.message-mine)");
+    var messageIds = [];
+    for (var i = 0; i < messages.length; i++) {
+      var id = messages[i].getAttribute("data-message-id");
+      if (id) messageIds.push(id);
+    }
 
     if (messageIds.length > 0) {
-      const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+      var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+      var csrfToken = csrfMeta ? csrfMeta.getAttribute("content") : "";
 
-      fetch("/messages/mark_read", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": csrfToken
-        },
-        body: JSON.stringify({ message_ids: messageIds })
-      }).catch(error => {
-        console.error("읽음 처리 오류:", error);
-      });
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/messages/mark_read", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.setRequestHeader("X-CSRF-Token", csrfToken);
+      xhr.send(JSON.stringify({ message_ids: messageIds }));
     }
   },
 
-  escapeHtml(text) {
-    const div = document.createElement("div");
+  escapeHtml: function(text) {
+    var div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
   },
 
-  escapeAttr(text) {
-    return text.replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  escapeAttr: function(text) {
+    return text.replace(/&/g, "&amp;").replace(/'/g, "&#39;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   },
 
-  scrollToBottom() {
-    const messagesContainer = document.getElementById("messages");
+  scrollToBottom: function() {
+    var messagesContainer = document.getElementById("messages");
     if (messagesContainer) {
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
