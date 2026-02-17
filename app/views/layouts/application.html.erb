@@ -39,10 +39,22 @@
     <% if notice.present? %>
       <div class="flash-notice"><%= notice %></div>
     <% end %>
-    
+
     <% if alert.present? %>
       <div class="flash-alert"><%= alert %></div>
     <% end %>
+
+    <script>
+      document.addEventListener("turbo:load", function() {
+        document.querySelectorAll(".flash-notice, .flash-alert").forEach(function(el) {
+          setTimeout(function() {
+            el.style.transition = "opacity 0.4s ease-out";
+            el.style.opacity = "0";
+            setTimeout(function() { el.remove(); }, 400);
+          }, 1000);
+        });
+      });
+    </script>
     
     <!-- 메인 컨텐츠 -->
     <%= yield %>
