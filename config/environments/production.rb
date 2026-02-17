@@ -85,7 +85,9 @@ Rails.application.configure do
   config.assume_ssl = true
   config.force_ssl = false
 
-  # ActionCable: 모든 오리진 허용 (Railway 동적 도메인 대응)
+  # ActionCable 설정
   config.action_cable.disable_request_forgery_protection = true
   config.action_cable.allowed_request_origins = [/.*/]
+  config.action_cable.mount_path = "/cable"
+  config.action_cable.url = nil  # meta tag에서 자동 결정 (consumer.js가 wss:// 처리)
 end
