@@ -3,8 +3,17 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   helper_method :current_user_record, :current_user, :current_nickname, :logged_in?
+  before_action :update_last_seen
 
   private
+
+  def update_last_seen
+    return unless logged_in?
+    return if current_user_record.admin?
+    return if current_user_record.last_seen_at && current_user_record.last_seen_at > 5.minutes.ago
+
+    current_user_record.touch_last_seen!
+  end
 
   def current_user_record
     @current_user_record ||= User.find_by(id: session[:user_id])

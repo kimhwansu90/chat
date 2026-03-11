@@ -14,6 +14,7 @@ class SessionsController < ApplicationController
       end
 
       session[:user_id] = user.id
+      user.touch_last_seen!
       redirect_to after_login_path, notice: "#{user.nickname}님, 환영합니다!"
     else
       flash.now[:alert] = "아이디 또는 비밀번호가 올바르지 않습니다."
