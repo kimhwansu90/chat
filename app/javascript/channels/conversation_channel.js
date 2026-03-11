@@ -85,8 +85,12 @@ function ensureConversationSubscription() {
   );
 }
 
+function toISODateStr(date) {
+  return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+}
+
 function createMessageElement(data) {
-  var today = new Date().toDateString();
+  var today = toISODateStr(new Date());
   var isMine = data.username === window.currentUser;
 
   if (data.message_type === "system") {
@@ -141,8 +145,9 @@ function createMessageElement(data) {
 
 function addDateDividerIfNeeded(container) {
   var today = new Date();
-  var todayStr = today.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric", weekday: "long" });
-  var todayDate = today.toDateString();
+  var weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+  var todayStr = today.getFullYear() + '년 ' + (today.getMonth() + 1) + '월 ' + today.getDate() + '일 ' + weekdays[today.getDay()] + '요일';
+  var todayDate = toISODateStr(today);
 
   var existingDividers = container.querySelectorAll(".date-divider");
   var hasTodayDivider = false;

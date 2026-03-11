@@ -51,7 +51,11 @@
             <div class="message-content-wrapper">
               <% if message.image.attached? %>
                 <div class="message-image" onclick="openImageViewer('<%= url_for(message.image) %>')">
-                  <%= image_tag message.image.variant(resize_to_limit: [400, 400]), class: "chat-thumbnail", loading: "lazy" %>
+                  <% begin %>
+                    <%= image_tag message.image.variant(resize_to_limit: [400, 400]), class: "chat-thumbnail", loading: "lazy" %>
+                  <% rescue LoadError %>
+                    <%= image_tag message.image, class: "chat-thumbnail", loading: "lazy" %>
+                  <% end %>
                 </div>
               <% end %>
               <% if message.content.present? %>
