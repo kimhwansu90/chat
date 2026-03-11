@@ -1,7 +1,7 @@
-class AdminChannel < ApplicationCable::Channel
+class AdminConversationsChannel < ApplicationCable::Channel
   def subscribed
     if current_user.admin?
-      stream_from "admin_channel"
+      stream_from "admin_conversations"
     else
       reject
     end

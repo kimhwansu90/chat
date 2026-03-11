@@ -67,8 +67,9 @@ function setupChat() {
       formData.append("image", selectedImageFile);
     }
 
+    var convId = document.getElementById("messages").getAttribute("data-conversation-id");
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/messages", true);
+    xhr.open("POST", "/conversations/" + convId + "/messages", true);
     xhr.setRequestHeader("X-CSRF-Token", token);
 
     xhr.onreadystatechange = function() {
@@ -222,34 +223,6 @@ window.closeImageViewer = function() {
   if (lightbox) {
     lightbox.style.display = "none";
   }
-};
-
-// 신고
-window.reportMessage = function(messageId) {
-  if (!confirm("이 메시지를 신고하시겠습니까?")) return;
-
-  var token = getCSRFToken();
-
-  var xhr = new XMLHttpRequest();
-  xhr.open("POST", "/messages/report", true);
-  xhr.setRequestHeader("Content-Type", "application/json");
-  xhr.setRequestHeader("X-CSRF-Token", token);
-
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        alert("신고가 접수되었습니다.");
-      } else {
-        alert("신고 처리에 실패했습니다.");
-      }
-    }
-  };
-
-  xhr.send(JSON.stringify({
-    message_id: messageId,
-    report_type: "inappropriate",
-    reason: "사용자 신고"
-  }));
 };
 
 function setupEmoji() {

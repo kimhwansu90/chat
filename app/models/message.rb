@@ -1,17 +1,10 @@
 class Message < ApplicationRecord
+  belongs_to :conversation, optional: true
   has_one_attached :image
-
-  attr_accessor :read_by_memory
-
-  after_initialize :set_defaults
 
   validate :acceptable_image, if: -> { image.attached? }
 
   scope :recent, -> { order(created_at: :desc) }
-
-  def read_count_except_sender
-    0
-  end
 
   def image_url
     return nil unless image.attached?
@@ -27,10 +20,6 @@ class Message < ApplicationRecord
   end
 
   private
-
-  def set_defaults
-    self.read_by_memory ||= []
-  end
 
   def acceptable_image
     unless image.blob.content_type.in?(%w[image/jpeg image/png image/gif image/webp])

@@ -3,20 +3,23 @@ module Admin
     skip_before_action :verify_authenticity_token, only: [:destroy]
 
     def index
-      @messages = Message.order(created_at: :desc).limit(100)
+      @messages = Message.where.not(conversation_id: nil).order(created_at: :desc).limit(100)
       @nicknames = User.pluck(:username, :nickname).to_h
     end
 
     def destroy
       message = Message.find(params[:id])
       message_id = message.id
+      conversation = message.conversation
 
       message.destroy
 
-      ActionCable.server.broadcast("chat_channel", {
-        type: "message_deleted",
-        message_id: message_id
-      })
+      if conversation
+        ActionCable.server.broadcast(conversation.channel_name, {
+          type: "message_deleted",
+          message_id: message_id
+        })
+      end
 
       redirect_to admin_messages_path, notice: "메시지가 삭제되었습니다."
     end

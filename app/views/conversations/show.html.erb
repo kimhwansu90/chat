@@ -1,28 +1,26 @@
-<!-- 채팅 메인 페이지 -->
 <div class="chat-container">
-  <!-- 상단 헤더 -->
   <div class="chat-header">
     <div class="header-left">
-      <div class="app-logo-small">
-        <span class="star-icon">⭐</span>
-      </div>
+      <% if current_user_record.admin? %>
+        <a href="<%= admin_conversations_path %>" class="btn-back">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      <% end %>
       <div class="header-info">
-        <h2 class="chat-title">별라채팅</h2>
-        <span class="online-status">● 온라인</span>
+        <h2 class="chat-title"><%= @other_user&.nickname || @other_user&.username || "채팅" %></h2>
       </div>
     </div>
-
     <div class="header-right">
-      <span class="current-user"><%= current_nickname %></span>
-      <% if current_user == "admin" %>
-        <a href="/admin" class="btn-admin" title="관리자 패널">관리</a>
+      <% if current_user_record.admin? %>
+        <a href="<%= admin_users_path %>" class="btn-header-action" title="사용자 관리">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 15.5H7.5c-1.396 0-2.093 0-2.661.172a4 4 0 00-2.667 2.667C2 18.907 2 19.604 2 21M14.5 7.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
       <% end %>
       <%= button_to "로그아웃", logout_path, method: :delete, class: "btn-logout" %>
     </div>
   </div>
 
-  <!-- 메시지 영역 -->
-  <div class="messages-container" id="messages">
+  <div class="messages-container" id="messages" data-conversation-id="<%= @conversation.id %>">
     <%
       weekdays = ['일', '월', '화', '수', '목', '금', '토']
       previous_date = nil
@@ -41,16 +39,14 @@
       <% end %>
 
       <% if message.message_type == "system" %>
-        <!-- 시스템 메시지 (공지) -->
         <div class="system-message" data-message-id="<%= message.id %>">
           <span class="system-message-text"><%= message.content %></span>
         </div>
       <% else %>
-        <!-- 메시지 -->
         <div class="message <%= 'message-mine' if message.username == current_user %>" data-message-id="<%= message.id %>" data-date="<%= current_date %>">
           <div class="message-bubble-wrapper">
             <% unless message.username == current_user %>
-              <div class="message-sender"><%= @nicknames[message.username] || message.nickname || message.username %></div>
+              <div class="message-sender"><%= message.nickname || message.username %></div>
             <% end %>
             <div class="message-content-wrapper">
               <% if message.image.attached? %>
@@ -59,18 +55,13 @@
                 </div>
               <% end %>
               <% if message.content.present? %>
-                <div class="message-content">
-                  <%= message.content %>
-                </div>
+                <div class="message-content"><%= message.content %></div>
               <% end %>
             </div>
             <div class="message-info">
-              <% unless message.username == current_user %>
-                <button class="btn-report" onclick="reportMessage(<%= message.id %>)" title="신고">⚠️</button>
-              <% end %>
               <% if message.username == current_user %>
-                <span class="read-status" data-read-count="1">
-                  <span class="checkmark single">✓</span>
+                <span class="read-status">
+                  <span class="checkmark single">1</span>
                 </span>
               <% end %>
               <span class="message-time"><%= message.created_at.strftime("%H:%M") %></span>
@@ -81,27 +72,22 @@
     <% end %>
   </div>
 
-  <!-- 이미지 미리보기 -->
   <div id="image-preview-bar" class="image-preview-bar" style="display: none;">
     <img id="image-preview-img" src="" alt="미리보기">
     <button type="button" id="cancel-image" class="btn-cancel-image" title="취소">✕</button>
   </div>
 
-  <!-- 메시지 입력 영역 -->
   <div class="message-input-container" id="message-input-container">
-    <div class="message-form" style="display: grid !important; grid-template-columns: 44px 44px 1fr 44px !important; gap: 8px !important;">
-      <!-- 이모티콘 버튼 -->
+    <div class="message-form">
       <button type="button" id="emoji-button" class="btn-emoji" title="이모티콘">
-        😊
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M8 14s1.5 2 4 2 4-2 4-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>
       </button>
 
-      <!-- 이미지 버튼 -->
       <button type="button" id="image-button" class="btn-image" title="이미지 전송">
-        📷
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 16l5-5 4 4 3-3 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <input type="file" id="image-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;">
 
-      <!-- 메시지 입력창 -->
       <input
         type="text"
         id="message-input"
@@ -110,27 +96,23 @@
         autocomplete="off"
         enterkeyhint="send">
 
-      <!-- 전송 버튼 -->
-      <button type="button" class="btn-send" id="send-button" title="전송" style="width: 44px !important; height: 44px !important; display: flex !important; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; border-radius: 50% !important; border: none !important;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <button type="button" class="btn-send" id="send-button" title="전송">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
     </div>
 
-    <!-- 이모티콘 피커 -->
     <div id="emoji-picker" class="emoji-picker" style="display: none;">
       <div class="emoji-picker-header">
         <span class="emoji-category">자주 사용</span>
       </div>
-      <div class="emoji-grid" id="emoji-grid">
-      </div>
+      <div class="emoji-grid" id="emoji-grid"></div>
     </div>
   </div>
 </div>
 
-<!-- 라이트박스 (풀스크린 이미지 뷰어) -->
 <div id="image-lightbox" class="image-lightbox" style="display: none;" onclick="closeImageViewer()">
   <div class="lightbox-content">
     <img id="lightbox-img" src="" alt="이미지">
@@ -138,7 +120,6 @@
   </div>
 </div>
 
-<!-- JavaScript로 현재 사용자 이름 전달 -->
 <script>
   window.currentUser = "<%= current_user %>";
 </script>

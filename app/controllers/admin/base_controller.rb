@@ -7,8 +7,8 @@ module Admin
     private
 
     def require_admin
-      unless current_user == "admin"
-        redirect_to chat_path, alert: "관리자만 접근 가능합니다."
+      unless current_user_record&.admin?
+        redirect_to conversations_path, alert: "관리자만 접근 가능합니다."
       end
     end
   end

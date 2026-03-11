@@ -1,9 +1,25 @@
 module Admin
   class UsersController < BaseController
-    skip_before_action :verify_authenticity_token, only: [:update_nickname, :ban, :unban, :kick]
+    skip_before_action :verify_authenticity_token, only: [:create, :update_nickname, :ban, :unban, :kick]
 
     def index
-      @users = User.order(:username)
+      @users = User.where.not(role: "admin").order(:username)
+    end
+
+    def new
+      @user = User.new
+    end
+
+    def create
+      @user = User.new(user_params)
+      @user.role = "user"
+
+      if @user.save
+        @user.conversations.create!(last_message_at: Time.current)
+        redirect_to admin_users_path, notice: "#{@user.nickname} 계정이 생성되었습니다."
+      else
+        render :new, status: :unprocessable_entity
+      end
     end
 
     def update_nickname
@@ -23,11 +39,13 @@ module Admin
 
       user.update(banned: true, banned_at: Time.current, banned_reason: reason)
 
-      # 차단된 사용자 강제 퇴장
-      ActionCable.server.broadcast("chat_channel", {
-        type: "user_kicked",
-        username: user.username
-      })
+      conversation = user.conversations.first
+      if conversation
+        ActionCable.server.broadcast(conversation.channel_name, {
+          type: "user_kicked",
+          username: user.username
+        })
+      end
 
       redirect_to admin_users_path, notice: "#{user.username}이(가) 차단되었습니다."
     end
@@ -41,12 +59,21 @@ module Admin
     def kick
       user = User.find(params[:id])
 
-      ActionCable.server.broadcast("chat_channel", {
-        type: "user_kicked",
-        username: user.username
-      })
+      conversation = user.conversations.first
+      if conversation
+        ActionCable.server.broadcast(conversation.channel_name, {
+          type: "user_kicked",
+          username: user.username
+        })
+      end
 
       redirect_to admin_users_path, notice: "#{user.username}이(가) 강제 퇴장되었습니다."
+    end
+
+    private
+
+    def user_params
+      params.require(:user).permit(:username, :nickname, :password, :password_confirmation)
     end
   end
 end

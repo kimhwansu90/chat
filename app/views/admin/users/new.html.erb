@@ -1,0 +1,41 @@
+<div class="admin-form-page">
+  <div class="admin-form-header">
+    <a href="<%= admin_users_path %>" class="btn-back">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <h1 class="admin-form-title">사용자 추가</h1>
+  </div>
+
+  <div class="admin-form-card">
+    <%= form_with model: @user, url: admin_users_path, method: :post, class: "admin-form" do |f| %>
+      <div class="form-group">
+        <%= f.label :username, "아이디", class: "form-label" %>
+        <%= f.text_field :username, class: "form-input", required: true, placeholder: "영문/숫자", autocomplete: "off" %>
+      </div>
+      <div class="form-group">
+        <%= f.label :nickname, "닉네임", class: "form-label" %>
+        <%= f.text_field :nickname, class: "form-input", required: true, placeholder: "표시 이름" %>
+      </div>
+      <div class="form-group">
+        <%= f.label :password, "비밀번호", class: "form-label" %>
+        <%= f.password_field :password, class: "form-input", required: true, autocomplete: "new-password" %>
+      </div>
+      <div class="form-group">
+        <%= f.label :password_confirmation, "비밀번호 확인", class: "form-label" %>
+        <%= f.password_field :password_confirmation, class: "form-input", required: true, autocomplete: "new-password" %>
+      </div>
+
+      <% if @user.errors.any? %>
+        <div class="form-errors">
+          <% @user.errors.full_messages.each do |msg| %>
+            <p class="error-text"><%= msg %></p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary btn-full">생성</button>
+      </div>
+    <% end %>
+  </div>
+</div>

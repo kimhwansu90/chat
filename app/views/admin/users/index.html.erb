@@ -1,14 +1,15 @@
 <div class="admin-page">
-  <h1 class="admin-page-title">사용자 관리</h1>
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">사용자 관리</h1>
+    <a href="<%= new_admin_user_path %>" class="btn-primary">사용자 추가</a>
+  </div>
 
   <div class="admin-table-wrapper">
     <table class="admin-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>사용자명</th>
+          <th>아이디</th>
           <th>닉네임</th>
-          <th>역할</th>
           <th>상태</th>
           <th>마지막 접속</th>
           <th>닉네임 변경</th>
@@ -18,10 +19,8 @@
       <tbody>
         <% @users.each do |user| %>
           <tr class="<%= 'banned-row' if user.banned? %>">
-            <td><%= user.id %></td>
             <td><%= user.username %></td>
             <td><%= user.nickname %></td>
-            <td><span class="admin-tag admin-tag-<%= user.role %>"><%= user.role %></span></td>
             <td>
               <% if user.banned? %>
                 <span class="admin-tag admin-tag-banned">차단됨</span>
@@ -38,14 +37,12 @@
               <% end %>
             </td>
             <td class="admin-actions">
-              <% unless user.username == "admin" %>
-                <% if user.banned? %>
-                  <%= button_to "차단 해제", unban_admin_user_path(user), method: :post, class: "admin-btn admin-btn-success admin-btn-sm" %>
-                <% else %>
-                  <%= button_to "차단", ban_admin_user_path(user), method: :post, class: "admin-btn admin-btn-danger admin-btn-sm", data: { turbo_confirm: "#{user.nickname}을(를) 차단하시겠습니까?" } %>
-                <% end %>
-                <%= button_to "퇴장", kick_admin_user_path(user), method: :post, class: "admin-btn admin-btn-warning admin-btn-sm", data: { turbo_confirm: "#{user.nickname}을(를) 강제 퇴장시키겠습니까?" } %>
+              <% if user.banned? %>
+                <%= button_to "해제", unban_admin_user_path(user), method: :post, class: "admin-btn admin-btn-success admin-btn-sm" %>
+              <% else %>
+                <%= button_to "차단", ban_admin_user_path(user), method: :post, class: "admin-btn admin-btn-danger admin-btn-sm", data: { turbo_confirm: "#{user.nickname}을(를) 차단하시겠습니까?" } %>
               <% end %>
+              <%= button_to "퇴장", kick_admin_user_path(user), method: :post, class: "admin-btn admin-btn-warning admin-btn-sm", data: { turbo_confirm: "#{user.nickname}을(를) 강제 퇴장시키겠습니까?" } %>
             </td>
           </tr>
         <% end %>
