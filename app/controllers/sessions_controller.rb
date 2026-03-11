@@ -4,7 +4,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    user = User.find_by(username: params[:username]) || User.find_by(nickname: params[:username])
+    user = User.find_by(username: params[:username])
 
     if user&.authenticate(params[:password])
       if user.banned?
