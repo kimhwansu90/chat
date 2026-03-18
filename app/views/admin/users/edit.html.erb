@@ -33,7 +33,11 @@
       </div>
       <div class="form-group">
         <label class="form-label">역할</label>
-        <%= f.select :role, User::ROLES.map { |r| [r, r] }, {}, class: "form-select" %>
+        <% selectable_roles = User::ROLES.reject { |r| r == "admin" } %>
+        <%= f.select :role,
+            selectable_roles.map { |r| [User::ROLE_LABELS[r] || r, r] },
+            {},
+            class: "form-select" %>
       </div>
       <div class="form-group">
         <label class="form-checkbox">

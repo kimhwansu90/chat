@@ -3,7 +3,7 @@
 <div class="page-header">
   <div>
     <h1 class="page-title">광고비 관리</h1>
-    <p class="page-subtitle">채널별 광고비를 수동으로 입력하고 ROI를 계산합니다</p>
+    <p class="page-subtitle">채널별 광고 지출 / 매출을 입력합니다</p>
   </div>
   <%= link_to "+ 광고비 추가", new_admin_ad_spend_path, class: "btn-primary" %>
 </div>
@@ -13,14 +13,29 @@
   <div class="kpi-grid" style="margin-bottom: 24px;">
     <% @total_by_channel.each do |channel, total| %>
       <div class="kpi-card">
-        <div class="kpi-label"><%= channel.upcase %> 총 광고비</div>
-        <div class="kpi-value" style="font-size: 20px;"><%= number_with_delimiter(total) %>원</div>
+        <div class="kpi-label"><%= channel.upcase %> 지출</div>
+        <div class="kpi-value" style="font-size: 18px; color: var(--danger);">
+          <%= number_with_delimiter(total) %>원
+        </div>
       </div>
     <% end %>
-    <div class="kpi-card" style="border-top: 3px solid var(--primary);">
-      <div class="kpi-label">전체 합계</div>
-      <div class="kpi-value" style="font-size: 20px; color: var(--primary);">
+    <div class="kpi-card" style="border-top: 3px solid var(--danger);">
+      <div class="kpi-label">총 지출</div>
+      <div class="kpi-value" style="font-size: 18px; color: var(--danger);">
         <%= number_with_delimiter(@total_by_channel.values.sum) %>원
+      </div>
+    </div>
+    <div class="kpi-card" style="border-top: 3px solid var(--success);">
+      <div class="kpi-label">총 매출</div>
+      <div class="kpi-value" style="font-size: 18px; color: var(--success);">
+        <%= number_with_delimiter(@total_revenue) %>원
+      </div>
+    </div>
+    <% net = @total_revenue - @total_by_channel.values.sum %>
+    <div class="kpi-card" style="border-top: 3px solid <%= net >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
+      <div class="kpi-label">순이익</div>
+      <div class="kpi-value" style="font-size: 18px; color: <%= net >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
+        <%= net >= 0 ? "+" : "" %><%= number_with_delimiter(net) %>원
       </div>
     </div>
   </div>
@@ -34,7 +49,9 @@
           <th>채널</th>
           <th>캠페인명</th>
           <th>기간</th>
-          <th style="text-align: right;">광고비</th>
+          <th style="text-align: right;">지출</th>
+          <th style="text-align: right;">매출</th>
+          <th style="text-align: right;">순이익</th>
           <th>메모</th>
           <th>등록자</th>
           <th></th>
@@ -42,6 +59,7 @@
       </thead>
       <tbody>
         <% @ad_spends.each do |ad| %>
+          <% profit = ad.net_profit %>
           <tr>
             <td>
               <span class="badge" style="background: #e0e7ff; color: #3730a3;"><%= ad.channel.upcase %></span>
@@ -53,14 +71,20 @@
             <td style="text-align: right; font-weight: 700; color: var(--danger);">
               <%= number_with_delimiter(ad.amount) %>원
             </td>
+            <td style="text-align: right; font-weight: 700; color: var(--success);">
+              <%= ad.revenue > 0 ? "#{number_with_delimiter(ad.revenue)}원" : "-" %>
+            </td>
+            <td style="text-align: right; font-weight: 700; color: <%= profit >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
+              <%= profit >= 0 ? "+" : "" %><%= number_with_delimiter(profit) %>원
+            </td>
             <td style="font-size: 13px; color: var(--text-secondary);"><%= ad.memo || "-" %></td>
             <td style="font-size: 13px;"><%= ad.created_by&.nickname || "-" %></td>
             <td>
               <div class="btn-group">
                 <%= link_to "수정", edit_admin_ad_spend_path(ad), class: "btn-secondary btn-sm" %>
                 <%= button_to "삭제", admin_ad_spend_path(ad), method: :delete,
-                    class: "btn-danger",
-                    data: { confirm: "삭제하시겠습니까?" } %>
+                    class: "btn-danger btn-sm",
+                    data: { turbo_confirm: "광고비 내역을 삭제하시겠습니까?" } %>
               </div>
             </td>
           </tr>

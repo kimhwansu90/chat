@@ -31,7 +31,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :users, only: [:index, :new, :create, :edit, :update]
+    resources :users, only: [:index, :new, :create, :edit, :update, :destroy]
 
     resources :ad_spends, only: [:index, :new, :create, :edit, :update, :destroy]
 

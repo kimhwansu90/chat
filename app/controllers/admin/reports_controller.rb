@@ -29,67 +29,41 @@ module Admin
     end
 
     def roi_report
-      period = @date_from.beginning_of_day..@date_to.end_of_day
+      ad_spends_in_period = AdSpend.in_period(@date_from, @date_to)
 
-      leads_in_period  = Lead.where(created_at: period)
-      @total_leads     = leads_in_period.count
-      @total_converted = leads_in_period.where(status: "converted").count
-      @total_revenue   = leads_in_period.where(status: "converted").sum(:contract_value).to_i
+      # 채널별 지출/매출 (AdSpend 직접 입력 기준)
+      @channel_stats = ad_spends_in_period.group(:channel).sum(:amount).map do |channel, spend|
+        revenue = ad_spends_in_period.where(channel: channel).sum(:revenue).to_i
+        { channel: channel, spend: spend.to_i, revenue: revenue, net: revenue - spend.to_i }
+      end.sort_by { |s| -s[:spend] }
 
-      # 수동 입력 광고비 합계 (기간이 조회 범위와 겹치는 것)
-      @total_ad_spend = AdSpend.in_period(@date_from, @date_to).sum(:amount).to_i
-      @ad_spends      = AdSpend.in_period(@date_from, @date_to).order(:channel, :period_start)
-
-      @net_profit  = @total_revenue - @total_ad_spend
-      @roi_percent = if @total_ad_spend > 0
+      @total_ad_spend = @channel_stats.sum { |s| s[:spend] }
+      @total_revenue  = @channel_stats.sum { |s| s[:revenue] }
+      @net_profit     = @total_revenue - @total_ad_spend
+      @roi_percent    = if @total_ad_spend > 0
         ((@total_revenue.to_f / @total_ad_spend - 1) * 100).round(1)
       else
         0
       end
 
-      # 채널별 광고비
-      @spend_by_channel = AdSpend.in_period(@date_from, @date_to).group(:channel).sum(:amount)
+      # 팀별 성과 (계약 완료 기준, contracted_at 기준)
+      contract_period = @date_from.beginning_of_day..@date_to.end_of_day
+      converted_leads = Lead.where(status: "converted")
+                            .where(contracted_at: contract_period)
+                            .where("contract_value > 0")
+                            .includes(:assigned_to)
 
-      # 캠페인별 성과 (UTM campaign 기준)
-      @by_campaign = leads_in_period
-        .where(status: "converted")
-        .where.not(utm_campaign: [nil, ""])
-        .group(:utm_campaign)
-        .sum(:contract_value)
-        .sort_by { |_, v| -v }
-        .map do |campaign_name, revenue|
-          lead_count = leads_in_period.where(utm_campaign: campaign_name).count
-          converted  = leads_in_period.where(status: "converted", utm_campaign: campaign_name).count
-          # 캠페인명이 일치하는 수동 광고비
-          ad_spend = AdSpend.in_period(@date_from, @date_to)
-                            .where("campaign_name ILIKE ?", "%#{campaign_name}%")
-                            .sum(:amount).to_i
-          {
-            name: campaign_name,
-            leads: lead_count,
-            converted: converted,
-            revenue: revenue.to_i,
-            ad_spend: ad_spend,
-            net_profit: revenue.to_i - ad_spend,
-            conversion_rate: lead_count > 0 ? (converted.to_f / lead_count * 100).round(1) : 0
-          }
-        end
+      @team_stats = converted_leads.group_by { |l| l.assigned_to }.map do |rep, leads|
+        { rep: rep, count: leads.size, revenue: leads.sum { |l| l.contract_value.to_i } }
+      end.sort_by { |s| -s[:revenue] }
 
-      # 채널별 매출
-      @by_source = leads_in_period
-        .where(status: "converted")
-        .where.not(utm_source: [nil, ""])
-        .group(:utm_source)
-        .sum(:contract_value)
-        .sort_by { |_, v| -v }
+      @total_converted = converted_leads.count
+
+      # 광고비 상세 내역
+      @ad_spends = ad_spends_in_period.order(:channel, :period_start)
 
       # 최근 계약 리드
-      @recent_contracts = Lead.where(status: "converted")
-                              .where("contract_value > 0")
-                              .where(created_at: period)
-                              .includes(:assigned_to)
-                              .order(contracted_at: :desc)
-                              .limit(20)
+      @recent_contracts = converted_leads.order(contracted_at: :desc).limit(20)
     end
 
     private

@@ -6,6 +6,7 @@ module Admin
     def index
       @ad_spends = AdSpend.includes(:created_by).recent
       @total_by_channel = AdSpend.group(:channel).sum(:amount)
+      @total_revenue = AdSpend.sum(:revenue).to_i
     end
 
     def new
@@ -50,7 +51,7 @@ module Admin
 
     def ad_spend_params
       params.require(:ad_spend).permit(
-        :channel, :campaign_name, :amount, :period_start, :period_end, :memo
+        :channel, :campaign_name, :amount, :revenue, :period_start, :period_end, :memo
       )
     end
   end

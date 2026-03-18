@@ -6,6 +6,11 @@ class AdSpend < ApplicationRecord
   validates :channel, :campaign_name, :amount, :period_start, :period_end, presence: true
   validates :channel, inclusion: { in: CHANNELS }
   validates :amount, numericality: { greater_than_or_equal_to: 0 }
+  validates :revenue, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+
+  def net_profit
+    revenue.to_i - amount.to_i
+  end
   validate :period_end_after_start
 
   scope :in_period, ->(from, to) {

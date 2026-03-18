@@ -1,11 +1,12 @@
-<% content_for(:title, "ROI 리포트 - HS Solution") %>
+<% content_for(:title, "광고 성과 리포트 - HS Solution") %>
 
 <div class="page-header">
   <div>
-    <h1 class="page-title">ROI 결과 리포트</h1>
-    <p class="page-subtitle">광고비 지출 대비 매출 및 순이익 분석</p>
+    <h1 class="page-title">광고 성과 리포트</h1>
+    <p class="page-subtitle">채널별 지출/매출 및 팀별 계약 결과</p>
   </div>
-  <div>
+  <div style="display: flex; gap: 8px;">
+    <%= link_to "+ 광고비 입력", new_admin_ad_spend_path, class: "btn-secondary btn-sm" %>
     <%= link_to "← 리포트", admin_reports_path, class: "btn-secondary btn-sm" %>
   </div>
 </div>
@@ -26,131 +27,164 @@
   <% end %>
 </div>
 
-<%# 핵심 KPI %>
-<div class="kpi-grid" style="grid-template-columns: repeat(5, 1fr); margin-bottom: 24px;">
-  <div class="kpi-card">
-    <div class="kpi-label">총 광고비</div>
-    <div class="kpi-value" style="font-size: 20px; color: var(--danger);">
+<%# 전체 KPI %>
+<div class="kpi-grid" style="margin-bottom: 24px;">
+  <div class="kpi-card" style="border-top: 3px solid var(--danger);">
+    <div class="kpi-label">총 광고비 지출</div>
+    <div class="kpi-value" style="font-size: 22px; color: var(--danger);">
       <%= number_with_delimiter(@total_ad_spend) %>원
     </div>
-    <div class="kpi-change">네이버 광고 기준</div>
   </div>
-  <div class="kpi-card">
+  <div class="kpi-card" style="border-top: 3px solid var(--success);">
     <div class="kpi-label">총 매출</div>
-    <div class="kpi-value" style="font-size: 20px; color: var(--success);">
+    <div class="kpi-value" style="font-size: 22px; color: var(--success);">
       <%= number_with_delimiter(@total_revenue) %>원
     </div>
-    <div class="kpi-change">계약 완료 기준</div>
   </div>
-  <div class="kpi-card" style="<%= @net_profit >= 0 ? 'border-top: 3px solid var(--success)' : 'border-top: 3px solid var(--danger)' %>">
+  <div class="kpi-card" style="border-top: 3px solid <%= @net_profit >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
     <div class="kpi-label">순이익</div>
-    <div class="kpi-value" style="font-size: 20px; color: <%= @net_profit >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
+    <div class="kpi-value" style="font-size: 22px; color: <%= @net_profit >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
       <%= @net_profit >= 0 ? "+" : "" %><%= number_with_delimiter(@net_profit) %>원
     </div>
-    <div class="kpi-change">매출 - 광고비</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">ROI</div>
-    <div class="kpi-value" style="font-size: 20px; color: <%= @roi_percent >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
+    <div class="kpi-value" style="font-size: 22px; color: <%= @roi_percent >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
       <%= @roi_percent >= 0 ? "+" : "" %><%= @roi_percent %>%
     </div>
-    <div class="kpi-change">(매출/광고비 - 1) × 100</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-label">전환율</div>
-    <div class="kpi-value" style="font-size: 20px;">
-      <%= @total_leads > 0 ? (@total_converted.to_f / @total_leads * 100).round(1) : 0 %>%
-    </div>
-    <div class="kpi-change"><%= @total_converted %> / <%= @total_leads %>건</div>
+    <div class="kpi-label">계약 건수</div>
+    <div class="kpi-value" style="font-size: 22px;"><%= @total_converted %>건</div>
   </div>
 </div>
 
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
-  <%# 캠페인별 ROI %>
+
+  <%# 채널별 지출/매출 %>
   <div class="card">
-    <div class="card-header">📣 캠페인별 성과 (UTM 기준)</div>
+    <div class="card-header">📣 채널별 지출 / 매출</div>
     <div class="card-body" style="padding: 0;">
-      <% if @by_campaign.any? %>
+      <% if @channel_stats.any? %>
         <table class="data-table">
           <thead>
             <tr>
-              <th>캠페인</th>
-              <th style="text-align: right;">리드</th>
-              <th style="text-align: right;">계약</th>
+              <th>채널</th>
+              <th style="text-align: right;">지출</th>
               <th style="text-align: right;">매출</th>
-              <th style="text-align: right;">광고비</th>
               <th style="text-align: right;">순이익</th>
             </tr>
           </thead>
           <tbody>
-            <% @by_campaign.each do |c| %>
+            <% @channel_stats.each do |s| %>
               <tr>
-                <td style="font-size: 13px;"><%= c[:name] %></td>
-                <td style="text-align: right;"><%= c[:leads] %></td>
-                <td style="text-align: right;">
-                  <%= c[:converted] %>
-                  <span style="font-size: 11px; color: var(--text-secondary);">(<%= c[:conversion_rate] %>%)</span>
+                <td>
+                  <span class="badge" style="background: #e0e7ff; color: #3730a3;">
+                    <%= s[:channel].upcase %>
+                  </span>
+                </td>
+                <td style="text-align: right; color: var(--danger); font-weight: 600;">
+                  <%= number_with_delimiter(s[:spend]) %>원
                 </td>
                 <td style="text-align: right; color: var(--success); font-weight: 600;">
-                  <%= number_with_delimiter(c[:revenue]) %>
-                </td>
-                <td style="text-align: right; color: var(--danger);">
-                  <%= c[:ad_spend] > 0 ? number_with_delimiter(c[:ad_spend]) : "-" %>
+                  <%= s[:revenue] > 0 ? "#{number_with_delimiter(s[:revenue])}원" : "-" %>
                 </td>
                 <td style="text-align: right; font-weight: 700;
-                    color: <%= c[:net_profit] >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
-                  <%= c[:net_profit] >= 0 ? "+" : "" %><%= number_with_delimiter(c[:net_profit]) %>
+                    color: <%= s[:net] >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
+                  <%= s[:net] >= 0 ? "+" : "" %><%= number_with_delimiter(s[:net]) %>원
                 </td>
               </tr>
             <% end %>
           </tbody>
+          <tfoot>
+            <tr style="background: var(--bg-secondary);">
+              <td style="font-weight: 700; padding: 10px 16px;">합계</td>
+              <td style="text-align: right; font-weight: 700; color: var(--danger); padding: 10px 16px;">
+                <%= number_with_delimiter(@total_ad_spend) %>원
+              </td>
+              <td style="text-align: right; font-weight: 700; color: var(--success); padding: 10px 16px;">
+                <%= number_with_delimiter(@total_revenue) %>원
+              </td>
+              <td style="text-align: right; font-weight: 700; padding: 10px 16px;
+                  color: <%= @net_profit >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
+                <%= @net_profit >= 0 ? "+" : "" %><%= number_with_delimiter(@net_profit) %>원
+              </td>
+            </tr>
+          </tfoot>
         </table>
       <% else %>
         <div class="empty-state">
-          <p class="empty-state-text">해당 기간에 계약 완료 리드가 없습니다</p>
+          <p class="empty-state-text">이 기간에 등록된 광고비가 없습니다</p>
+          <%= link_to "+ 광고비 입력", new_admin_ad_spend_path, class: "btn-primary btn-sm" %>
         </div>
       <% end %>
     </div>
   </div>
 
-  <%# 채널별 매출 %>
+  <%# 팀별 계약 결과 %>
   <div class="card">
-    <div class="card-header">📊 채널별 매출</div>
-    <div class="card-body">
-      <% if @by_source.any? %>
-        <% max_revenue = @by_source.map { |_, v| v }.max.to_f.nonzero? || 1 %>
-        <% @by_source.each do |source, revenue| %>
-          <div style="margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-              <span style="font-size: 14px; font-weight: 500;"><%= source %></span>
-              <span style="font-size: 14px; font-weight: 700; color: var(--success);">
-                <%= number_with_delimiter(revenue.to_i) %>원
-              </span>
-            </div>
-            <div class="bar-chart-track">
-              <div class="bar-chart-fill"
-                   style="width: <%= (revenue.to_f / max_revenue * 100).round %>%; background: var(--success);">
-              </div>
-            </div>
-          </div>
-        <% end %>
+    <div class="card-header">👥 팀별 계약 결과</div>
+    <div class="card-body" style="padding: 0;">
+      <% if @team_stats.any? %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>담당자</th>
+              <th>역할</th>
+              <th style="text-align: right;">계약수</th>
+              <th style="text-align: right;">매출</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @team_stats.each do |s| %>
+              <tr>
+                <td style="font-weight: 600;">
+                  <%= s[:rep]&.nickname || "미배정" %>
+                </td>
+                <td>
+                  <% role = s[:rep]&.role %>
+                  <span class="badge badge-<%= role %>">
+                    <%= User::ROLE_LABELS[role] || role || "-" %>
+                  </span>
+                </td>
+                <td style="text-align: right;"><%= s[:count] %>건</td>
+                <td style="text-align: right; font-weight: 700; color: var(--success);">
+                  <%= number_with_delimiter(s[:revenue]) %>원
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot>
+            <tr style="background: var(--bg-secondary);">
+              <td colspan="2" style="font-weight: 700; padding: 10px 16px;">합계</td>
+              <td style="text-align: right; font-weight: 700; padding: 10px 16px;">
+                <%= @total_converted %>건
+              </td>
+              <td style="text-align: right; font-weight: 700; color: var(--success); padding: 10px 16px;">
+                <%= number_with_delimiter(@team_stats.sum { |s| s[:revenue] }) %>원
+              </td>
+            </tr>
+          </tfoot>
+        </table>
       <% else %>
-        <p class="info-text">채널별 매출 데이터 없음</p>
+        <div class="empty-state">
+          <p class="empty-state-text">이 기간에 계약 완료 건이 없습니다</p>
+        </div>
       <% end %>
     </div>
   </div>
 </div>
 
-<%# 최근 계약 리스트 %>
-<div class="card">
-  <div class="card-header">✅ 기간 내 계약 완료 리드</div>
+<%# 최근 계약 리드 %>
+<div class="card" style="margin-bottom: 24px;">
+  <div class="card-header">✅ 계약 완료 리드</div>
   <% if @recent_contracts.any? %>
     <table class="data-table">
       <thead>
         <tr>
           <th>이름</th>
           <th>전화번호</th>
-          <th>캠페인</th>
+          <th>채널</th>
           <th>담당자</th>
           <th style="text-align: right;">계약금액</th>
           <th>계약일</th>
@@ -164,7 +198,7 @@
                   style: "color: var(--primary); text-decoration: none; font-weight: 500;" %>
             </td>
             <td><%= lead.phone || "-" %></td>
-            <td><%= lead.utm_campaign || lead.utm_source || "-" %></td>
+            <td><%= lead.utm_source || "직접" %></td>
             <td><%= lead.assigned_to&.nickname || "미배정" %></td>
             <td style="text-align: right; font-weight: 700; color: var(--success);">
               <%= number_with_delimiter(lead.contract_value.to_i) %>원
@@ -173,15 +207,6 @@
           </tr>
         <% end %>
       </tbody>
-      <tfoot>
-        <tr style="background: var(--bg-secondary);">
-          <td colspan="4" style="font-weight: 700; padding: 12px 16px;">합계</td>
-          <td style="text-align: right; font-weight: 700; color: var(--success); padding: 12px 16px;">
-            <%= number_with_delimiter(@recent_contracts.sum { |l| l.contract_value.to_i }) %>원
-          </td>
-          <td></td>
-        </tr>
-      </tfoot>
     </table>
   <% else %>
     <div class="empty-state">
@@ -190,10 +215,10 @@
   <% end %>
 </div>
 
-<%# 이번 기간 등록된 광고비 %>
-<div class="card" style="margin-top: 24px;">
+<%# 광고비 상세 내역 %>
+<div class="card">
   <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-    <span>📋 기간 내 광고비 내역</span>
+    <span>📋 광고비 상세 내역</span>
     <%= link_to "+ 광고비 추가", new_admin_ad_spend_path, class: "btn-primary btn-sm" %>
   </div>
   <% if @ad_spends.any? %>
@@ -203,7 +228,8 @@
           <th>채널</th>
           <th>캠페인명</th>
           <th>기간</th>
-          <th style="text-align: right;">광고비</th>
+          <th style="text-align: right;">지출</th>
+          <th style="text-align: right;">매출</th>
           <th>메모</th>
         </tr>
       </thead>
@@ -215,22 +241,16 @@
             <td style="font-size: 13px; color: var(--text-secondary);">
               <%= ad.period_start.strftime("%m/%d") %> ~ <%= ad.period_end.strftime("%m/%d") %>
             </td>
-            <td style="text-align: right; font-weight: 600; color: var(--danger);">
+            <td style="text-align: right; color: var(--danger); font-weight: 600;">
               <%= number_with_delimiter(ad.amount) %>원
+            </td>
+            <td style="text-align: right; color: var(--success); font-weight: 600;">
+              <%= ad.revenue > 0 ? "#{number_with_delimiter(ad.revenue)}원" : "-" %>
             </td>
             <td style="font-size: 13px; color: var(--text-secondary);"><%= ad.memo || "-" %></td>
           </tr>
         <% end %>
       </tbody>
-      <tfoot>
-        <tr style="background: var(--bg-secondary);">
-          <td colspan="3" style="font-weight: 700; padding: 12px 16px;">합계</td>
-          <td style="text-align: right; font-weight: 700; color: var(--danger); padding: 12px 16px;">
-            <%= number_with_delimiter(@total_ad_spend) %>원
-          </td>
-          <td></td>
-        </tr>
-      </tfoot>
     </table>
   <% else %>
     <div class="empty-state">

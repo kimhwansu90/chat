@@ -17,7 +17,7 @@
     </div>
 
     <div class="form-group">
-      <label class="form-label">캠페인명 * <span class="info-text">(UTM 캠페인과 동일하게 입력)</span></label>
+      <label class="form-label">캠페인명 *</label>
       <%= f.text_field :campaign_name, class: "form-input", required: true,
           placeholder: "예: 리뷰노트-플레이스-상위노출" %>
     </div>
@@ -31,16 +31,27 @@
       <label class="form-label">광고 기간 종료 *</label>
       <%= f.date_field :period_end, class: "form-input", required: true %>
     </div>
-  </div>
 
-  <div class="form-group">
-    <label class="form-label">광고비 (원) *</label>
-    <div style="position: relative;">
-      <%= f.number_field :amount, class: "form-input", required: true,
-          min: 0, step: 1000, placeholder: "0",
-          style: "padding-right: 40px;" %>
-      <span style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
-                   color: var(--text-secondary); font-size: 14px;">원</span>
+    <div class="form-group">
+      <label class="form-label">광고비 지출 (원) *</label>
+      <div style="position: relative;">
+        <%= f.number_field :amount, class: "form-input", required: true,
+            min: 0, step: 1000, placeholder: "0",
+            style: "padding-right: 40px;" %>
+        <span style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+                     color: var(--text-secondary); font-size: 14px;">원</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">매출 (원)</label>
+      <div style="position: relative;">
+        <%= f.number_field :revenue, class: "form-input",
+            min: 0, step: 1000, placeholder: "0",
+            style: "padding-right: 40px;" %>
+        <span style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+                     color: var(--text-secondary); font-size: 14px;">원</span>
+      </div>
     </div>
   </div>
 
