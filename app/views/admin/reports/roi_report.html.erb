@@ -36,7 +36,7 @@
     </div>
   </div>
   <div class="kpi-card" style="border-top: 3px solid var(--success);">
-    <div class="kpi-label">총 매출</div>
+    <div class="kpi-label">총 매출 (계약금액 합산)</div>
     <div class="kpi-value" style="font-size: 22px; color: var(--success);">
       <%= number_with_delimiter(@total_revenue) %>원
     </div>
@@ -61,18 +61,17 @@
 
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
 
-  <%# 채널별 지출/매출 %>
+  <%# 채널별 광고비 지출 %>
   <div class="card">
-    <div class="card-header">📣 채널별 지출 / 매출</div>
+    <div class="card-header">📣 채널별 광고비 지출</div>
     <div class="card-body" style="padding: 0;">
       <% if @channel_stats.any? %>
         <table class="data-table">
           <thead>
             <tr>
               <th>채널</th>
-              <th style="text-align: right;">지출</th>
-              <th style="text-align: right;">매출</th>
-              <th style="text-align: right;">순이익</th>
+              <th style="text-align: right;">광고비 지출</th>
+              <th style="text-align: right;">비율</th>
             </tr>
           </thead>
           <tbody>
@@ -86,12 +85,8 @@
                 <td style="text-align: right; color: var(--danger); font-weight: 600;">
                   <%= number_with_delimiter(s[:spend]) %>원
                 </td>
-                <td style="text-align: right; color: var(--success); font-weight: 600;">
-                  <%= s[:revenue] > 0 ? "#{number_with_delimiter(s[:revenue])}원" : "-" %>
-                </td>
-                <td style="text-align: right; font-weight: 700;
-                    color: <%= s[:net] >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
-                  <%= s[:net] >= 0 ? "+" : "" %><%= number_with_delimiter(s[:net]) %>원
+                <td style="text-align: right; font-size: 13px; color: var(--text-secondary);">
+                  <%= @total_ad_spend > 0 ? "#{(s[:spend].to_f / @total_ad_spend * 100).round(1)}%" : "-" %>
                 </td>
               </tr>
             <% end %>
@@ -102,13 +97,7 @@
               <td style="text-align: right; font-weight: 700; color: var(--danger); padding: 10px 16px;">
                 <%= number_with_delimiter(@total_ad_spend) %>원
               </td>
-              <td style="text-align: right; font-weight: 700; color: var(--success); padding: 10px 16px;">
-                <%= number_with_delimiter(@total_revenue) %>원
-              </td>
-              <td style="text-align: right; font-weight: 700; padding: 10px 16px;
-                  color: <%= @net_profit >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
-                <%= @net_profit >= 0 ? "+" : "" %><%= number_with_delimiter(@net_profit) %>원
-              </td>
+              <td></td>
             </tr>
           </tfoot>
         </table>

@@ -1,5 +1,9 @@
-<%= link_to admin_lead_path(lead), class: "lead-card", id: "lead_#{lead.id}",
-    draggable: true, data: { lead_id: lead.id, action: "dragstart->pipeline#dragStart dragend->pipeline#dragEnd" } do %>
+<div class="lead-card"
+     id="lead_<%= lead.id %>"
+     draggable="true"
+     data-lead-id="<%= lead.id %>"
+     data-href="<%= admin_lead_path(lead) %>"
+     data-action="dragstart->pipeline#dragStart dragend->pipeline#dragEnd click->pipeline#openLead">
   <div class="lead-card-name"><%= lead.name %></div>
   <% if lead.phone.present? %>
     <div class="lead-card-info"><%= lead.phone %></div>
@@ -19,4 +23,4 @@
       <span style="color: var(--warning); font-size: 11px;">미배정</span>
     <% end %>
   </div>
-<% end %>
+</div>

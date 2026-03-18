@@ -20,6 +20,7 @@ Rails.application.routes.draw do
         patch :update_status
         post :assign
         patch :update_contract
+        delete :clear_contract
       end
       resources :activities, only: [:create], controller: "lead_activities"
     end

@@ -33,7 +33,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">역할</label>
-        <% selectable_roles = User::ROLES.reject { |r| r == "admin" } %>
+        <% selectable_roles = User::ROLES.reject { |r| %w[admin sales_rep].include?(r) } %>
         <%= f.select :role,
             selectable_roles.map { |r| [User::ROLE_LABELS[r] || r, r] },
             { selected: "team1" },

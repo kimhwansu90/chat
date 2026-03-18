@@ -29,41 +29,43 @@ module Admin
     end
 
     def roi_report
+      contract_period = @date_from.beginning_of_day..@date_to.end_of_day
+
+      # 계약 완료 리드 (contracted_at 기준) - 계약금액이 매출
+      converted_leads = Lead.where(status: "converted")
+                            .where(contracted_at: contract_period)
+                            .includes(:assigned_to)
+
+      # 매출 = 리드 계약금액 합산
+      @total_revenue  = converted_leads.sum(:contract_value).to_i
+      @total_converted = converted_leads.count
+
+      # 광고비 = 수동 입력 AdSpend
       ad_spends_in_period = AdSpend.in_period(@date_from, @date_to)
+      @total_ad_spend = ad_spends_in_period.sum(:amount).to_i
 
-      # 채널별 지출/매출 (AdSpend 직접 입력 기준)
-      @channel_stats = ad_spends_in_period.group(:channel).sum(:amount).map do |channel, spend|
-        revenue = ad_spends_in_period.where(channel: channel).sum(:revenue).to_i
-        { channel: channel, spend: spend.to_i, revenue: revenue, net: revenue - spend.to_i }
-      end.sort_by { |s| -s[:spend] }
-
-      @total_ad_spend = @channel_stats.sum { |s| s[:spend] }
-      @total_revenue  = @channel_stats.sum { |s| s[:revenue] }
-      @net_profit     = @total_revenue - @total_ad_spend
-      @roi_percent    = if @total_ad_spend > 0
+      @net_profit  = @total_revenue - @total_ad_spend
+      @roi_percent = if @total_ad_spend > 0
         ((@total_revenue.to_f / @total_ad_spend - 1) * 100).round(1)
       else
         0
       end
 
-      # 팀별 성과 (계약 완료 기준, contracted_at 기준)
-      contract_period = @date_from.beginning_of_day..@date_to.end_of_day
-      converted_leads = Lead.where(status: "converted")
-                            .where(contracted_at: contract_period)
-                            .where("contract_value > 0")
-                            .includes(:assigned_to)
+      # 채널별 광고비 지출
+      @channel_stats = ad_spends_in_period.group(:channel).sum(:amount).map do |channel, spend|
+        { channel: channel, spend: spend.to_i }
+      end.sort_by { |s| -s[:spend] }
 
-      @team_stats = converted_leads.group_by { |l| l.assigned_to }.map do |rep, leads|
+      # 팀별 계약 결과
+      @team_stats = converted_leads.where("contract_value > 0").group_by(&:assigned_to).map do |rep, leads|
         { rep: rep, count: leads.size, revenue: leads.sum { |l| l.contract_value.to_i } }
       end.sort_by { |s| -s[:revenue] }
-
-      @total_converted = converted_leads.count
 
       # 광고비 상세 내역
       @ad_spends = ad_spends_in_period.order(:channel, :period_start)
 
       # 최근 계약 리드
-      @recent_contracts = converted_leads.order(contracted_at: :desc).limit(20)
+      @recent_contracts = converted_leads.where("contract_value > 0").order(contracted_at: :desc).limit(20)
     end
 
     private

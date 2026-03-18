@@ -81,6 +81,10 @@
               <span class="info-value"><%= @lead.contracted_at.strftime("%Y-%m-%d") %></span>
             </div>
           <% end %>
+          <%= button_to "계약 삭제", clear_contract_admin_lead_path(@lead), method: :delete,
+              class: "btn-danger btn-sm",
+              style: "margin-bottom: 8px;",
+              data: { turbo_confirm: "계약 정보를 삭제하시겠습니까?" } %>
         <% else %>
           <p class="info-text" style="margin-bottom: 12px;">계약 완료 시 금액을 입력하세요.</p>
         <% end %>

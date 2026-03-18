@@ -1,6 +1,6 @@
 module Admin
   class LeadsController < BaseController
-    before_action :set_lead, only: [:show, :edit, :update, :destroy, :update_status, :assign, :update_contract]
+    before_action :set_lead, only: [:show, :edit, :update, :destroy, :update_status, :assign, :update_contract, :clear_contract]
 
     def index
       @leads_by_status = Lead::STATUSES.each_with_object({}) do |status, hash|
@@ -86,6 +86,16 @@ module Admin
         content: "계약금액 #{ActiveSupport::NumberHelper.number_to_delimited(value)}원 입력"
       )
       redirect_to admin_lead_path(@lead), notice: "계약금액이 저장되었습니다."
+    end
+
+    def clear_contract
+      @lead.update!(contract_value: 0, contracted_at: nil)
+      @lead.activities.create!(
+        activity_type: "note",
+        user: current_user_record,
+        content: "계약금액 초기화"
+      )
+      redirect_to admin_lead_path(@lead), notice: "계약 정보가 삭제되었습니다."
     end
 
     private

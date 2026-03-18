@@ -3,20 +3,31 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["column"]
 
+  connect() {
+    this._dragging = false
+  }
+
   dragStart(event) {
-    // 링크 기본 드래그(URL 드래그) 방지
-    event.stopPropagation()
+    this._dragging = true
     const card = event.currentTarget
     const leadId = card.dataset.leadId
     card.classList.add("dragging")
-    event.dataTransfer.clearData()
+    // <div>이므로 URL 충돌 없음. text/plain에 ID만 세팅
     event.dataTransfer.setData("text/plain", leadId)
     event.dataTransfer.effectAllowed = "move"
-    console.log("[Pipeline] dragStart leadId=", leadId)
   }
 
   dragEnd(event) {
     event.currentTarget.classList.remove("dragging")
+    // 드래그 종료 후 짧은 시간 후 클릭 방지 플래그 해제
+    setTimeout(() => { this._dragging = false }, 100)
+  }
+
+  // 드래그 중이 아닐 때만 카드 클릭 → 상세 페이지 이동
+  openLead(event) {
+    if (this._dragging) return
+    const href = event.currentTarget.dataset.href
+    if (href) window.location.href = href
   }
 
   dragOver(event) {
@@ -42,38 +53,28 @@ export default class extends Controller {
 
     const leadId = event.dataTransfer.getData("text/plain")
     const newStatus = column.dataset.status
-    console.log("[Pipeline] drop leadId=", leadId, "newStatus=", newStatus)
 
-    if (!leadId || !newStatus) {
-      console.warn("[Pipeline] drop aborted: missing leadId or newStatus")
-      return
-    }
+    if (!leadId || !newStatus) return
 
     const card = document.getElementById(`lead_${leadId}`)
-    if (!card) {
-      console.warn("[Pipeline] drop aborted: card not found for lead_" + leadId)
-      return
-    }
+    if (!card) return
 
     const originalParent = card.parentElement
+    // 같은 컬럼이면 무시
+    if (originalParent === column) return
+
     column.appendChild(card)
 
     const ok = await this.updateLeadStatus(leadId, newStatus)
     if (!ok) {
-      console.error("[Pipeline] status update failed, reverting card")
       originalParent.appendChild(card)
     } else {
-      console.log("[Pipeline] status updated successfully")
       this.updateColumnCounts()
     }
   }
 
   async updateLeadStatus(leadId, newStatus) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
-    if (!csrfToken) {
-      console.error("[Pipeline] CSRF token not found")
-      return false
-    }
 
     try {
       const response = await fetch(`/admin/leads/${leadId}/update_status`, {
@@ -88,16 +89,8 @@ export default class extends Controller {
       })
 
       const data = await response.json().catch(() => ({}))
-      console.log("[Pipeline] server response:", response.status, data)
-
-      if (response.ok && data.ok) {
-        return true
-      } else {
-        console.error("[Pipeline] server error:", data.error || response.status)
-        return false
-      }
-    } catch (error) {
-      console.error("[Pipeline] network error:", error)
+      return response.ok && data.ok
+    } catch {
       return false
     }
   }
