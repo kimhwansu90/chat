@@ -5,11 +5,11 @@ default: &default
 
 development:
   <<: *default
-  database: leadhub_development
+  database: hs_solution_development
 
 test:
   <<: *default
-  database: leadhub_test
+  database: hs_solution_test
 
 production:
   url: <%= ENV["DATABASE_URL"] %>
