@@ -1,0 +1,57 @@
+<%= form_with model: [:admin, ad_spend], local: true do |f| %>
+  <% if ad_spend.errors.any? %>
+    <div class="form-errors">
+      <% ad_spend.errors.full_messages.each do |msg| %>
+        <p class="error-text"><%= msg %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div class="form-group">
+      <label class="form-label">채널 *</label>
+      <%= f.select :channel,
+          AdSpend::CHANNELS.map { |c| [c.upcase, c] },
+          { prompt: "선택" },
+          { class: "form-select", required: true } %>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">캠페인명 * <span class="info-text">(UTM 캠페인과 동일하게 입력)</span></label>
+      <%= f.text_field :campaign_name, class: "form-input", required: true,
+          placeholder: "예: 리뷰노트-플레이스-상위노출" %>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">광고 기간 시작 *</label>
+      <%= f.date_field :period_start, class: "form-input", required: true %>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">광고 기간 종료 *</label>
+      <%= f.date_field :period_end, class: "form-input", required: true %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">광고비 (원) *</label>
+    <div style="position: relative;">
+      <%= f.number_field :amount, class: "form-input", required: true,
+          min: 0, step: 1000, placeholder: "0",
+          style: "padding-right: 40px;" %>
+      <span style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+                   color: var(--text-secondary); font-size: 14px;">원</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">메모 (선택)</label>
+    <%= f.text_area :memo, class: "form-textarea", rows: 2,
+        placeholder: "예: 3월 네이버 검색광고 플레이스 캠페인" %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit ad_spend.persisted? ? "수정" : "등록", class: "btn-primary" %>
+    <%= link_to "취소", admin_ad_spends_path, class: "btn-secondary" %>
+  </div>
+<% end %>

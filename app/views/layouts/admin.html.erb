@@ -36,9 +36,9 @@
             문의 폼
           </a>
           <% if current_user_record&.manager_or_above? %>
-            <a href="<%= admin_nad_accounts_path %>" class="admin-nav-item <%= 'active' if controller_name.start_with?('nad') %>">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-              광고 관리
+            <a href="<%= admin_ad_spends_path %>" class="admin-nav-item <%= 'active' if controller_name == 'ad_spends' %>">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              광고비 관리
             </a>
             <a href="<%= admin_reports_path %>" class="admin-nav-item <%= 'active' if controller_name == 'reports' %>">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><line x1="18" y1="20" x2="18" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="20" x2="12" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="20" x2="6" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>

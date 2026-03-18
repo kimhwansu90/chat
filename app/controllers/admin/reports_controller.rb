@@ -31,26 +31,26 @@ module Admin
     def roi_report
       period = @date_from.beginning_of_day..@date_to.end_of_day
 
-      # 기간 내 전체 리드 및 계약 현황
-      leads_in_period = Lead.where(created_at: period)
-      @total_leads    = leads_in_period.count
+      leads_in_period  = Lead.where(created_at: period)
+      @total_leads     = leads_in_period.count
       @total_converted = leads_in_period.where(status: "converted").count
-      @total_revenue  = leads_in_period.where(status: "converted").sum(:contract_value).to_i
+      @total_revenue   = leads_in_period.where(status: "converted").sum(:contract_value).to_i
 
-      # 네이버 광고비 합계 (기간 내 nad_reports)
-      @total_ad_spend = NadReport.where(report_date: @date_from..@date_to).sum(:cost).to_i
+      # 수동 입력 광고비 합계 (기간이 조회 범위와 겹치는 것)
+      @total_ad_spend = AdSpend.in_period(@date_from, @date_to).sum(:amount).to_i
+      @ad_spends      = AdSpend.in_period(@date_from, @date_to).order(:channel, :period_start)
 
-      # 순이익 = 매출 - 광고비
-      @net_profit = @total_revenue - @total_ad_spend
-
-      # ROI %
+      @net_profit  = @total_revenue - @total_ad_spend
       @roi_percent = if @total_ad_spend > 0
         ((@total_revenue.to_f / @total_ad_spend - 1) * 100).round(1)
       else
         0
       end
 
-      # 캠페인별 ROI 분석 (UTM 캠페인 기준)
+      # 채널별 광고비
+      @spend_by_channel = AdSpend.in_period(@date_from, @date_to).group(:channel).sum(:amount)
+
+      # 캠페인별 성과 (UTM campaign 기준)
       @by_campaign = leads_in_period
         .where(status: "converted")
         .where.not(utm_campaign: [nil, ""])
@@ -60,11 +60,10 @@ module Admin
         .map do |campaign_name, revenue|
           lead_count = leads_in_period.where(utm_campaign: campaign_name).count
           converted  = leads_in_period.where(status: "converted", utm_campaign: campaign_name).count
-          # 해당 캠페인명과 매칭되는 NAD 광고비 (캠페인명 부분 일치)
-          ad_spend = NadReport.joins("JOIN nad_campaigns ON nad_reports.entity_id = nad_campaigns.external_id")
-                              .where("nad_campaigns.name ILIKE ?", "%#{campaign_name}%")
-                              .where(report_date: @date_from..@date_to)
-                              .sum(:cost).to_i
+          # 캠페인명이 일치하는 수동 광고비
+          ad_spend = AdSpend.in_period(@date_from, @date_to)
+                            .where("campaign_name ILIKE ?", "%#{campaign_name}%")
+                            .sum(:amount).to_i
           {
             name: campaign_name,
             leads: lead_count,
