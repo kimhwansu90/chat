@@ -7,32 +7,47 @@ export default class extends Controller {
     this._dragging = false
   }
 
+  // ─── 카드 이벤트 ────────────────────────────────────────────
   dragStart(event) {
     this._dragging = true
     const card = event.currentTarget
-    const leadId = card.dataset.leadId
     card.classList.add("dragging")
-    // <div>이므로 URL 충돌 없음. text/plain에 ID만 세팅
-    event.dataTransfer.setData("text/plain", leadId)
+    event.dataTransfer.setData("text/plain", card.dataset.leadId)
     event.dataTransfer.effectAllowed = "move"
   }
 
   dragEnd(event) {
     event.currentTarget.classList.remove("dragging")
-    // 드래그 종료 후 짧은 시간 후 클릭 방지 플래그 해제
     setTimeout(() => { this._dragging = false }, 100)
   }
 
-  // 드래그 중이 아닐 때만 카드 클릭 → 상세 페이지 이동
   openLead(event) {
     if (this._dragging) return
     const href = event.currentTarget.dataset.href
     if (href) window.location.href = href
   }
 
+  // 카드 위에 드래그할 때 – 부모 컬럼으로 위임
+  cardDragOver(event) {
+    event.preventDefault()
+    event.dataTransfer.dropEffect = "move"
+    const column = event.currentTarget.closest(".pipeline-column-body")
+    if (column) column.classList.add("drag-over")
+  }
+
+  // 카드 위에 드롭할 때 – 부모 컬럼을 대상으로 처리
+  cardDrop(event) {
+    event.preventDefault()
+    event.stopPropagation()            // 컬럼 drop �핸들러 중복 방지
+    const column = event.currentTarget.closest(".pipeline-column-body")
+    if (column) this.processDropOnColumn(event, column)
+  }
+
+  // ─── 컬럼 이벤트 (빈 공간에 드롭 시) ───────────────────────
   dragOver(event) {
     event.preventDefault()
     event.dataTransfer.dropEffect = "move"
+    event.currentTarget.classList.add("drag-over")
   }
 
   dragEnter(event) {
@@ -46,10 +61,16 @@ export default class extends Controller {
     }
   }
 
-  async drop(event) {
+  drop(event) {
     event.preventDefault()
-    const column = event.currentTarget
+    this.processDropOnColumn(event, event.currentTarget)
+  }
+
+  // ─── 공통 처리 ──────────────────────────────────────────────
+  async processDropOnColumn(event, column) {
     column.classList.remove("drag-over")
+    // 모든 컬럼의 drag-over 클래스 정리
+    this.columnTargets.forEach(c => c.classList.remove("drag-over"))
 
     const leadId = event.dataTransfer.getData("text/plain")
     const newStatus = column.dataset.status
@@ -60,8 +81,7 @@ export default class extends Controller {
     if (!card) return
 
     const originalParent = card.parentElement
-    // 같은 컬럼이면 무시
-    if (originalParent === column) return
+    if (originalParent === column) return   // 같은 컬럼이면 무시
 
     column.appendChild(card)
 
@@ -75,7 +95,6 @@ export default class extends Controller {
 
   async updateLeadStatus(leadId, newStatus) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
-
     try {
       const response = await fetch(`/admin/leads/${leadId}/update_status`, {
         method: "PATCH",
@@ -87,7 +106,6 @@ export default class extends Controller {
         },
         body: `status=${encodeURIComponent(newStatus)}`
       })
-
       const data = await response.json().catch(() => ({}))
       return response.ok && data.ok
     } catch {

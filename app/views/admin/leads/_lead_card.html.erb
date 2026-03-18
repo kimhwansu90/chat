@@ -3,7 +3,7 @@
      draggable="true"
      data-lead-id="<%= lead.id %>"
      data-href="<%= admin_lead_path(lead) %>"
-     data-action="dragstart->pipeline#dragStart dragend->pipeline#dragEnd click->pipeline#openLead">
+     data-action="dragstart->pipeline#dragStart dragend->pipeline#dragEnd click->pipeline#openLead dragover->pipeline#cardDragOver drop->pipeline#cardDrop">
   <div class="lead-card-name"><%= lead.name %></div>
   <% if lead.phone.present? %>
     <div class="lead-card-info"><%= lead.phone %></div>
