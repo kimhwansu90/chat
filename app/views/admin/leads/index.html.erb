@@ -1,0 +1,27 @@
+<% content_for(:title, "리드 관리 - LeadHub") %>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">리드 관리</h1>
+    <p class="page-subtitle">파이프라인 보드</p>
+  </div>
+  <%= link_to "리드 등록", new_admin_lead_path, class: "btn-primary btn-sm" %>
+</div>
+
+<div class="pipeline-board" data-controller="pipeline">
+  <% Lead::STATUSES.each do |status| %>
+    <div class="pipeline-column">
+      <div class="pipeline-column-header">
+        <span class="pipeline-column-title"><%= Lead::STATUS_LABELS[status] %></span>
+        <span class="pipeline-column-count"><%= @leads_by_status[status]&.size || 0 %></span>
+      </div>
+      <div class="pipeline-column-body"
+           data-pipeline-target="column"
+           data-status="<%= status %>"
+           data-action="dragover->pipeline#dragOver drop->pipeline#drop dragenter->pipeline#dragEnter dragleave->pipeline#dragLeave">
+        <% (@leads_by_status[status] || []).each do |lead| %>
+          <%= render partial: "admin/leads/lead_card", locals: { lead: lead } %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,50 @@
+<% content_for(:title, "팀 성과 - LeadHub") %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">팀 성과</h1>
+    <p class="page-subtitle"><%= @date_from.strftime("%Y.%m.%d") %> ~ <%= @date_to.strftime("%Y.%m.%d") %></p>
+  </div>
+  <%= link_to "← 리포트 홈", admin_reports_path(date_from: @date_from, date_to: @date_to), class: "btn btn-secondary" %>
+</div>
+
+<% if @by_sales_rep.empty? %>
+  <div class="card">
+    <div class="empty-state"><p>등록된 영업사원이 없습니다.</p></div>
+  </div>
+<% else %>
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>영업사원</th>
+          <th>총 리드</th>
+          <th>상담중/견적</th>
+          <th>계약</th>
+          <th>전환율</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @by_sales_rep.each_with_index do |rep, idx| %>
+          <tr>
+            <td>
+              <% if idx == 0 %><span style="margin-right: 0.25rem;">🥇</span><% end %>
+              <strong><%= rep[:name] %></strong>
+            </td>
+            <td><%= rep[:total] %></td>
+            <td><%= rep[:in_progress] %></td>
+            <td><span class="badge badge-success"><%= rep[:converted] %></span></td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div class="pipeline-bar-track" style="width: 60px;">
+                  <div class="pipeline-bar-fill" style="width: <%= rep[:conversion_rate] %>%; background: var(--success);"></div>
+                </div>
+                <span><%= rep[:conversion_rate] %>%</span>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

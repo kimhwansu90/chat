@@ -1,0 +1,47 @@
+<%= form_with(model: [:admin, nad_account], class: "form") do |f| %>
+  <% if nad_account.errors.any? %>
+    <div class="alert alert-danger">
+      <ul>
+        <% nad_account.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :name, "계정명" %>
+    <%= f.text_field :name, class: "form-control", placeholder: "예: 메인 브랜드 계정" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :customer_id, "Customer ID" %>
+    <%= f.text_field :customer_id, class: "form-control", placeholder: "네이버 광고 고객번호" %>
+    <small class="form-help">네이버 검색광고 관리시스템에서 확인할 수 있습니다.</small>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :api_key, "API Key" %>
+    <%= f.password_field :api_key, class: "form-control", autocomplete: "off",
+        placeholder: nad_account.persisted? ? "변경하려면 입력 (빈칸=기존 유지)" : "API Key 입력" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :api_secret, "API Secret" %>
+    <%= f.password_field :api_secret, class: "form-control", autocomplete: "off",
+        placeholder: nad_account.persisted? ? "변경하려면 입력 (빈칸=기존 유지)" : "API Secret 입력" %>
+    <small class="form-help">네이버 검색광고 API 인증 정보입니다. 안전하게 암호화 저장됩니다.</small>
+  </div>
+
+  <div class="form-group">
+    <label class="checkbox-label">
+      <%= f.check_box :active %>
+      활성 계정 (동기화 대상에 포함)
+    </label>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit nad_account.persisted? ? "저장" : "등록", class: "btn btn-primary" %>
+    <%= link_to "취소", admin_nad_accounts_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

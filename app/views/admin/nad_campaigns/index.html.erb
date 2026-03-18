@@ -1,0 +1,72 @@
+<% content_for(:title, "캠페인 관리 - LeadHub") %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">캠페인 관리</h1>
+    <p class="page-subtitle">네이버 검색광고 캠페인 현황</p>
+  </div>
+</div>
+
+<% if @nad_accounts.empty? %>
+  <div class="card">
+    <div class="empty-state">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">📡</div>
+      <h3>등록된 광고 계정이 없습니다</h3>
+      <p>먼저 광고 계정을 등록하세요.</p>
+      <%= link_to "광고 계정 등록", new_admin_nad_account_path, class: "btn btn-primary" %>
+    </div>
+  </div>
+<% else %>
+  <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+    <% @nad_accounts.each do |account| %>
+      <%= link_to account.name, admin_nad_campaigns_path(nad_account_id: account.id),
+          class: "btn #{@selected_account&.id == account.id ? 'btn-primary' : 'btn-secondary'}" %>
+    <% end %>
+  </div>
+
+  <% if @selected_account %>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <p class="text-muted"><%= @selected_account.name %> — 총 <%= @campaigns.count %>개 캠페인</p>
+      <%= button_to "동기화", sync_admin_nad_account_path(@selected_account), method: :post, class: "btn btn-sm btn-secondary" %>
+    </div>
+
+    <% if @campaigns.empty? %>
+      <div class="card">
+        <div class="empty-state">
+          <p>동기화된 캠페인이 없습니다. 동기화 버튼을 눌러 캠페인을 가져오세요.</p>
+        </div>
+      </div>
+    <% else %>
+      <div class="card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>캠페인명</th>
+              <th>유형</th>
+              <th>상태</th>
+              <th>일예산</th>
+              <th>광고그룹</th>
+              <th>마지막 동기화</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @campaigns.each do |campaign| %>
+              <tr>
+                <td><%= link_to campaign.name, admin_nad_campaign_path(campaign) %></td>
+                <td><code style="font-size: 0.8rem;"><%= campaign.campaign_type %></code></td>
+                <td>
+                  <span class="badge <%= campaign.status == 'ELIGIBLE' ? 'badge-success' : 'badge-secondary' %>">
+                    <%= campaign.status_label %>
+                  </span>
+                </td>
+                <td><%= campaign.budget ? "#{campaign.budget.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse}원" : "-" %></td>
+                <td><%= campaign.nad_ad_groups.count %>개</td>
+                <td><%= campaign.synced_at&.strftime("%m/%d %H:%M") || "-" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

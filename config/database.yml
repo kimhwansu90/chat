@@ -1,17 +1,15 @@
-# SQLite for development/test, PostgreSQL for production (Railway)
-
-default: &default_sqlite
-  adapter: sqlite3
+default: &default
+  adapter: postgresql
+  encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  timeout: 5000
 
 development:
-  <<: *default_sqlite
-  database: storage/development.sqlite3
+  <<: *default
+  database: leadhub_development
 
 test:
-  <<: *default_sqlite
-  database: storage/test.sqlite3
+  <<: *default
+  database: leadhub_test
 
 production:
   url: <%= ENV["DATABASE_URL"] %>

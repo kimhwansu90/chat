@@ -9,49 +9,73 @@ admin.assign_attributes(
 admin.save!
 puts "Admin account ready: admin / 7359"
 
-# 기존 유저 중 password_digest 없는 계정에 비밀번호 설정
-User.where(password_digest: [nil, ""]).where.not(role: "admin").find_each do |user|
-  user.update!(password: "1234", password_confirmation: "1234")
-  puts "Password set for: #{user.username} (#{user.nickname}) / 1234"
+# Manager 계정
+manager = User.find_or_initialize_by(username: "manager1")
+manager.assign_attributes(
+  password: "test1234",
+  password_confirmation: "test1234",
+  nickname: "김매니저",
+  role: "manager",
+  email: "manager@test.com"
+)
+manager.save!
+puts "Manager account ready: manager1 / test1234"
+
+# Sales Rep 계정
+sales1 = User.find_or_initialize_by(username: "sales1")
+sales1.assign_attributes(
+  password: "test1234",
+  password_confirmation: "test1234",
+  nickname: "이영업",
+  role: "sales_rep",
+  phone: "010-1234-5678"
+)
+sales1.save!
+
+sales2 = User.find_or_initialize_by(username: "sales2")
+sales2.assign_attributes(
+  password: "test1234",
+  password_confirmation: "test1234",
+  nickname: "박영업",
+  role: "sales_rep",
+  phone: "010-9876-5432"
+)
+sales2.save!
+puts "Sales reps ready: sales1, sales2 / test1234"
+
+# 문의 폼
+form = Form.find_or_initialize_by(slug: "free-consultation")
+form.assign_attributes(
+  name: "무료 상담 신청",
+  description: "전문 상담사가 연락드립니다",
+  created_by: admin
+)
+form.save!
+
+if form.form_fields.empty?
+  form.form_fields.create!(label: "이름", field_type: "text", name: "name", required: true, position: 0)
+  form.form_fields.create!(label: "연락처", field_type: "phone", name: "phone", required: true, position: 1)
+  form.form_fields.create!(label: "이메일", field_type: "email", name: "email", required: false, position: 2)
+  form.form_fields.create!(label: "문의 내용", field_type: "textarea", name: "message", required: false, position: 3)
 end
+puts "Form '#{form.name}' ready with #{form.form_fields.count} fields"
+puts "Public URL: /f/#{form.slug}"
 
-# 대화방 없는 유저에게 대화방 생성
-User.where.not(role: "admin").find_each do |user|
-  next if user.conversations.exists?
-
-  conv = Conversation.create!(user: user, last_message_at: Time.current)
-  puts "Conversation created for: #{user.nickname} (id: #{conv.id})"
-end
-
-# conversation_id 없는 기존 메시지를 올바른 대화방에 연결
-orphan_messages = Message.where(conversation_id: nil)
-if orphan_messages.any?
-  orphan_messages.find_each do |msg|
-    sender = User.find_by(username: msg.username)
-    next unless sender
-
-    user = sender.admin? ? nil : sender
-    user ||= User.where.not(role: "admin").find_by(username: msg.username)
-
-    # admin이 보낸 메시지는 대화 상대를 찾아야 함
-    if sender.admin?
-      # 단일 대화 시스템이었으므로, admin이 아닌 유저의 대화방에 연결
-      non_admin_users = User.where.not(role: "admin")
-      if non_admin_users.count == 1
-        target_user = non_admin_users.first
-      else
-        # 여러 유저가 있으면, 기존 시스템에서는 유타지와만 대화했으므로
-        target_user = User.find_by(username: "user") || non_admin_users.first
-      end
-      conv = target_user&.conversations&.first
-    else
-      conv = sender.conversations.first
-    end
-
-    if conv
-      msg.update_column(:conversation_id, conv.id)
-      conv.update_column(:last_message_at, msg.created_at) if conv.last_message_at.nil? || msg.created_at > conv.last_message_at
-    end
+# 샘플 리드
+if Lead.count == 0
+  sales_reps = User.sales_reps.to_a
+  5.times do |i|
+    lead = Lead.create!(
+      name: "테스트 고객 #{i + 1}",
+      phone: "010-1111-#{1000 + i}",
+      status: Lead::STATUSES.sample,
+      form: form,
+      assigned_to: sales_reps.sample,
+      utm_source: %w[naver meta google].sample,
+      utm_medium: "cpc",
+      utm_campaign: "봄맞이 이벤트"
+    )
+    lead.activities.create!(activity_type: "note", user: admin, content: "자동 생성된 샘플 리드")
   end
-  puts "#{orphan_messages.count} orphan messages linked to conversations"
+  puts "#{Lead.count} sample leads created"
 end

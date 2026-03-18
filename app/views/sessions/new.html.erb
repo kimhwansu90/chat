@@ -1,16 +1,15 @@
-<% content_for(:title, "로그인 - 별라채팅") %>
-<% content_for(:meta_description, "별라채팅에 로그인하세요. 안전한 프라이빗 메시징 서비스입니다.") %>
+<% content_for(:title, "로그인 - LeadHub") %>
 <div class="login-container">
   <div class="login-box">
     <div class="login-header">
       <div class="app-logo">
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
           <rect width="48" height="48" rx="12" fill="#4e598c"/>
-          <path d="M15 33l4-10h4l4 10M17 29h6M30 23v10M30 23c3 0 5 1.2 5 3.5S33 30 30 30" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 34V14h6l4 12 4-12h6v20M14 24h14" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h1 class="app-title">별라채팅</h1>
-      <p class="app-subtitle">프라이빗 메시징</p>
+      <h1 class="app-title">LeadHub</h1>
+      <p class="app-subtitle">리드 관리 시스템</p>
     </div>
 
     <%= form_with url: login_path, method: :post, class: "login-form" do |f| %>

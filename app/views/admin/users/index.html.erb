@@ -1,53 +1,45 @@
-<% content_for(:title, "사용자 관리 - 별라채팅 관리자") %>
-<div class="admin-page">
-  <div class="admin-page-header">
-    <h1 class="admin-page-title">사용자 관리</h1>
-    <a href="<%= new_admin_user_path %>" class="btn-primary">사용자 추가</a>
+<% content_for(:title, "팀 관리 - LeadHub") %>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">팀 관리</h1>
+    <p class="page-subtitle">팀원 계정 관리</p>
   </div>
+  <%= link_to "팀원 추가", new_admin_user_path, class: "btn-primary btn-sm" %>
+</div>
 
-  <div class="admin-table-wrapper">
-    <table class="admin-table">
-      <thead>
+<div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>아이디</th>
+        <th>닉네임</th>
+        <th>역할</th>
+        <th>이메일</th>
+        <th>상태</th>
+        <th>마지막 접속</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
         <tr>
-          <th>아이디</th>
-          <th>닉네임</th>
-          <th>상태</th>
-          <th>마지막 접속</th>
-          <th>닉네임 변경</th>
-          <th>관리</th>
+          <td><%= user.username %></td>
+          <td><strong><%= user.nickname %></strong></td>
+          <td><span class="badge badge-<%= user.role %>"><%= user.role %></span></td>
+          <td><%= user.email || "-" %></td>
+          <td>
+            <% if user.active? %>
+              <span class="badge badge-active">활성</span>
+            <% else %>
+              <span class="badge badge-inactive">비활성</span>
+            <% end %>
+          </td>
+          <td><%= user.last_seen_at&.strftime("%m/%d %H:%M") || "-" %></td>
+          <td>
+            <%= link_to "수정", edit_admin_user_path(user), class: "btn-secondary btn-sm" %>
+          </td>
         </tr>
-      </thead>
-      <tbody>
-        <% @users.each do |user| %>
-          <tr class="<%= 'banned-row' if user.banned? %>">
-            <td><%= user.username %></td>
-            <td><%= user.nickname %></td>
-            <td>
-              <% if user.banned? %>
-                <span class="admin-tag admin-tag-banned">차단됨</span>
-                <br><small><%= user.banned_reason %></small>
-              <% else %>
-                <span class="admin-tag admin-tag-active">활성</span>
-              <% end %>
-            </td>
-            <td><%= user.last_seen_at&.strftime("%m/%d %H:%M") || "-" %></td>
-            <td>
-              <%= form_tag update_nickname_admin_user_path(user), method: :patch, class: "admin-inline-form" do %>
-                <input type="text" name="nickname" value="<%= user.nickname %>" class="admin-input-sm" placeholder="새 닉네임">
-                <button type="submit" class="admin-btn admin-btn-sm">변경</button>
-              <% end %>
-            </td>
-            <td class="admin-actions">
-              <% if user.banned? %>
-                <%= button_to "해제", unban_admin_user_path(user), method: :post, class: "admin-btn admin-btn-success admin-btn-sm" %>
-              <% else %>
-                <%= button_to "차단", ban_admin_user_path(user), method: :post, class: "admin-btn admin-btn-danger admin-btn-sm", data: { turbo_confirm: "#{user.nickname}을(를) 차단하시겠습니까?" } %>
-              <% end %>
-              <%= button_to "퇴장", kick_admin_user_path(user), method: :post, class: "admin-btn admin-btn-warning admin-btn-sm", data: { turbo_confirm: "#{user.nickname}을(를) 강제 퇴장시키겠습니까?" } %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+      <% end %>
+    </tbody>
+  </table>
 </div>

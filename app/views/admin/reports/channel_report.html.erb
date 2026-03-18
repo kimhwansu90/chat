@@ -1,0 +1,55 @@
+<% content_for(:title, "채널 분석 - LeadHub") %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">채널 분석</h1>
+    <p class="page-subtitle"><%= @date_from.strftime("%Y.%m.%d") %> ~ <%= @date_to.strftime("%Y.%m.%d") %></p>
+  </div>
+  <%= link_to "← 리포트 홈", admin_reports_path(date_from: @date_from, date_to: @date_to), class: "btn btn-secondary" %>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+  <div class="card">
+    <div class="card-header"><h3>유입 채널 (utm_source)</h3></div>
+    <div style="padding: 1rem;">
+      <% if @by_channel.empty? %>
+        <p class="text-muted">데이터 없음</p>
+      <% else %>
+        <% max = @by_channel.values.max.to_f.nonzero? || 1 %>
+        <% @by_channel.each do |channel, count| %>
+          <div style="margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+              <span style="font-weight: 500;"><%= channel %></span>
+              <strong><%= count %>건</strong>
+            </div>
+            <div class="pipeline-bar-track">
+              <div class="pipeline-bar-fill" style="width: <%= (count / max * 100).round %>%; background: var(--primary);"></div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>캠페인 TOP 10 (utm_campaign)</h3></div>
+    <div style="padding: 1rem;">
+      <% if @by_campaign.empty? %>
+        <p class="text-muted">데이터 없음</p>
+      <% else %>
+        <% max = @by_campaign.map(&:last).max.to_f.nonzero? || 1 %>
+        <% @by_campaign.each do |campaign, count| %>
+          <div style="margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+              <span style="font-size: 0.875rem; font-weight: 500;"><%= campaign %></span>
+              <strong><%= count %>건</strong>
+            </div>
+            <div class="pipeline-bar-track">
+              <div class="pipeline-bar-fill" style="width: <%= (count / max * 100).round %>%; background: var(--success);"></div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

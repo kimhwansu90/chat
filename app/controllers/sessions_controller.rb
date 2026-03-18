@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   def new
-    redirect_to after_login_path if logged_in?
+    redirect_to admin_root_path if logged_in?
   end
 
   def create
@@ -13,9 +13,15 @@ class SessionsController < ApplicationController
         return
       end
 
+      unless user.active?
+        flash.now[:alert] = "비활성화된 계정입니다."
+        render :new, status: :unprocessable_entity
+        return
+      end
+
       session[:user_id] = user.id
       user.touch_last_seen!
-      redirect_to after_login_path, notice: "#{user.nickname}님, 환영합니다!"
+      redirect_to admin_root_path, notice: "#{user.nickname}님, 환영합니다!"
     else
       flash.now[:alert] = "아이디 또는 비밀번호가 올바르지 않습니다."
       render :new, status: :unprocessable_entity
@@ -25,11 +31,5 @@ class SessionsController < ApplicationController
   def destroy
     session.delete(:user_id)
     redirect_to login_path, notice: "로그아웃되었습니다."
-  end
-
-  private
-
-  def after_login_path
-    current_user_record&.admin? ? admin_root_path : conversations_path
   end
 end

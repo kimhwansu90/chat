@@ -1,31 +1,12 @@
-<% content_for(:title, "사용자 추가 - 별라채팅 관리자") %>
+<% content_for(:title, "팀원 추가 - LeadHub") %>
 <div class="admin-form-page">
-  <div class="admin-form-header">
-    <a href="<%= admin_users_path %>" class="btn-back">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </a>
-    <h1 class="admin-form-title">사용자 추가</h1>
+  <div class="page-header">
+    <h1 class="page-title">팀원 추가</h1>
+    <%= link_to "목록", admin_users_path, class: "btn-secondary btn-sm" %>
   </div>
 
   <div class="admin-form-card">
-    <%= form_with model: @user, url: admin_users_path, method: :post, class: "admin-form" do |f| %>
-      <div class="form-group">
-        <%= f.label :username, "아이디", class: "form-label" %>
-        <%= f.text_field :username, class: "form-input", required: true, placeholder: "영문/숫자", autocomplete: "off" %>
-      </div>
-      <div class="form-group">
-        <%= f.label :nickname, "닉네임", class: "form-label" %>
-        <%= f.text_field :nickname, class: "form-input", required: true, placeholder: "표시 이름" %>
-      </div>
-      <div class="form-group">
-        <%= f.label :password, "비밀번호", class: "form-label" %>
-        <%= f.password_field :password, class: "form-input", required: true, autocomplete: "new-password" %>
-      </div>
-      <div class="form-group">
-        <%= f.label :password_confirmation, "비밀번호 확인", class: "form-label" %>
-        <%= f.password_field :password_confirmation, class: "form-input", required: true, autocomplete: "new-password" %>
-      </div>
-
+    <%= form_with model: [:admin, @user], url: admin_users_path, method: :post do |f| %>
       <% if @user.errors.any? %>
         <div class="form-errors">
           <% @user.errors.full_messages.each do |msg| %>
@@ -34,8 +15,38 @@
         </div>
       <% end %>
 
+      <div class="form-group">
+        <label class="form-label">아이디 *</label>
+        <%= f.text_field :username, class: "form-input", required: true, placeholder: "영문/숫자", autocomplete: "off" %>
+      </div>
+      <div class="form-group">
+        <label class="form-label">닉네임 *</label>
+        <%= f.text_field :nickname, class: "form-input", required: true, placeholder: "표시 이름" %>
+      </div>
+      <div class="form-group">
+        <label class="form-label">이메일</label>
+        <%= f.email_field :email, class: "form-input", placeholder: "이메일" %>
+      </div>
+      <div class="form-group">
+        <label class="form-label">전화번호</label>
+        <%= f.text_field :phone, class: "form-input", placeholder: "010-1234-5678" %>
+      </div>
+      <div class="form-group">
+        <label class="form-label">역할</label>
+        <%= f.select :role, User::ROLES.map { |r| [r, r] }, {}, class: "form-select" %>
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호 *</label>
+        <%= f.password_field :password, class: "form-input", required: true, autocomplete: "new-password" %>
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호 확인 *</label>
+        <%= f.password_field :password_confirmation, class: "form-input", required: true, autocomplete: "new-password" %>
+      </div>
+
       <div class="form-actions">
-        <button type="submit" class="btn-primary btn-full">생성</button>
+        <%= f.submit "생성", class: "btn-primary" %>
+        <%= link_to "취소", admin_users_path, class: "btn-secondary" %>
       </div>
     <% end %>
   </div>

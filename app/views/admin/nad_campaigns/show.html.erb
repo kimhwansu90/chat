@@ -1,0 +1,46 @@
+<% content_for(:title, "#{@campaign.name} - LeadHub") %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><%= @campaign.name %></h1>
+    <p class="page-subtitle">
+      <span class="badge <%= @campaign.status == 'ELIGIBLE' ? 'badge-success' : 'badge-secondary' %>">
+        <%= @campaign.status_label %>
+      </span>
+      &nbsp;<%= @campaign.campaign_type %>
+    </p>
+  </div>
+  <%= link_to "← 캠페인 목록", admin_nad_campaigns_path(nad_account_id: @campaign.nad_account_id), class: "btn btn-secondary" %>
+</div>
+
+<div class="card">
+  <div class="card-header"><h3>광고그룹</h3></div>
+  <% if @ad_groups.empty? %>
+    <div class="empty-state"><p>광고그룹 데이터가 없습니다. 계정을 동기화하세요.</p></div>
+  <% else %>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>광고그룹명</th>
+          <th>상태</th>
+          <th>키워드 수</th>
+          <th>동기화</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @ad_groups.each do |ag| %>
+          <tr>
+            <td><strong><%= ag.name %></strong></td>
+            <td>
+              <span class="badge <%= ag.status == 'ELIGIBLE' ? 'badge-success' : 'badge-secondary' %>">
+                <%= ag.status_label %>
+              </span>
+            </td>
+            <td><%= ag.nad_keywords.count %>개</td>
+            <td><%= ag.synced_at&.strftime("%m/%d %H:%M") || "-" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</div>

@@ -1,0 +1,98 @@
+<% content_for(:title, "리포트 - LeadHub") %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">리포트</h1>
+    <p class="page-subtitle">리드 및 영업 성과 분석</p>
+  </div>
+</div>
+
+<%# 날짜 필터 %>
+<div class="card" style="margin-bottom: 1.5rem;">
+  <%= form_with url: admin_reports_path, method: :get, local: true, style: "display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;" do |f| %>
+    <div class="form-group" style="margin-bottom: 0;">
+      <label>시작일</label>
+      <%= f.date_field :date_from, value: @date_from, class: "form-control" %>
+    </div>
+    <div class="form-group" style="margin-bottom: 0;">
+      <label>종료일</label>
+      <%= f.date_field :date_to, value: @date_to, class: "form-control" %>
+    </div>
+    <%= f.submit "조회", class: "btn btn-primary" %>
+  <% end %>
+</div>
+
+<%# KPI %>
+<div class="stats-grid" style="margin-bottom: 1.5rem;">
+  <div class="kpi-card">
+    <div class="kpi-label">기간 내 리드</div>
+    <div class="kpi-value"><%= @stats[:total] %></div>
+    <div class="kpi-meta"><%= @date_from.strftime("%m/%d") %> ~ <%= @date_to.strftime("%m/%d") %></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">전환율</div>
+    <div class="kpi-value"><%= @stats[:conversion_rate] %>%</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">미배정 리드</div>
+    <div class="kpi-value"><%= @stats[:unassigned] %></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">이번주 신규</div>
+    <div class="kpi-value"><%= @stats[:this_week] %></div>
+  </div>
+</div>
+
+<%# 빠른 네비게이션 %>
+<div class="card" style="margin-bottom: 1.5rem;">
+  <div style="display: flex; gap: 1rem; padding: 1rem;">
+    <%= link_to "📊 리드 리포트", lead_report_admin_reports_path(date_from: @date_from, date_to: @date_to), class: "btn btn-secondary" %>
+    <%= link_to "📣 채널 분석", channel_report_admin_reports_path(date_from: @date_from, date_to: @date_to), class: "btn btn-secondary" %>
+    <%= link_to "👥 팀 성과", team_report_admin_reports_path(date_from: @date_from, date_to: @date_to), class: "btn btn-secondary" %>
+    <%= link_to "📡 광고 리포트", admin_nad_reports_path, class: "btn btn-secondary" %>
+  </div>
+</div>
+
+<%# 상태별 분포 %>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+  <div class="card">
+    <div class="card-header"><h3>상태별 리드</h3></div>
+    <div style="padding: 1rem;">
+      <% Lead::STATUS_LABELS.each do |status, label| %>
+        <% count = @stats[:by_status][status] || 0 %>
+        <% total = @stats[:total].to_f.nonzero? || 1 %>
+        <div style="margin-bottom: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+            <span><%= label %></span>
+            <strong><%= count %></strong>
+          </div>
+          <div class="pipeline-bar-track">
+            <div class="pipeline-bar-fill" style="width: <%= (count / total * 100).round %>%; background: var(--primary);"></div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>채널별 리드</h3></div>
+    <div style="padding: 1rem;">
+      <% if @stats[:by_channel].empty? %>
+        <p class="text-muted">데이터 없음</p>
+      <% else %>
+        <% max_channel = @stats[:by_channel].values.max.to_f.nonzero? || 1 %>
+        <% @stats[:by_channel].each do |channel, count| %>
+          <div style="margin-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+              <span><%= channel %></span>
+              <strong><%= count %></strong>
+            </div>
+            <div class="pipeline-bar-track">
+              <div class="pipeline-bar-fill" style="width: <%= (count / max_channel * 100).round %>%; background: var(--success);"></div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

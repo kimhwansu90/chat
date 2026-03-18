@@ -1,0 +1,117 @@
+<% content_for(:title, "광고 리포트 - LeadHub") %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">광고 성과 리포트</h1>
+    <p class="page-subtitle">네이버 검색광고 캠페인 성과 분석</p>
+  </div>
+</div>
+
+<% if @nad_accounts.empty? %>
+  <div class="card">
+    <div class="empty-state">
+      <h3>등록된 광고 계정이 없습니다</h3>
+      <%= link_to "광고 계정 등록", new_admin_nad_account_path, class: "btn btn-primary" %>
+    </div>
+  </div>
+<% else %>
+  <%# 필터 영역 %>
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <%= form_with url: admin_nad_reports_path, method: :get, local: true, style: "display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;" do |f| %>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label>광고 계정</label>
+        <%= f.select :nad_account_id,
+            options_for_select(@nad_accounts.map { |a| [a.name, a.id] }, @selected_account&.id),
+            {}, class: "form-control" %>
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label>시작일</label>
+        <%= f.date_field :date_from, value: @date_from, class: "form-control" %>
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label>종료일</label>
+        <%= f.date_field :date_to, value: @date_to, class: "form-control" %>
+      </div>
+      <%= f.submit "조회", class: "btn btn-primary" %>
+    <% end %>
+
+    <% if @selected_account %>
+      <div style="border-top: 1px solid var(--border); margin-top: 1rem; padding-top: 1rem; display: flex; gap: 0.5rem; align-items: center;">
+        <span style="color: var(--text-muted); font-size: 0.875rem;">데이터 가져오기:</span>
+        <%= form_with url: fetch_admin_nad_reports_path, method: :post, local: true, style: "display: flex; gap: 0.5rem;" do |f| %>
+          <%= f.hidden_field :nad_account_id, value: @selected_account.id %>
+          <%= f.hidden_field :date_from, value: @date_from %>
+          <%= f.hidden_field :date_to, value: @date_to %>
+          <%= f.submit "API에서 가져오기", class: "btn btn-sm btn-secondary",
+              data: { turbo_confirm: "#{@date_from} ~ #{@date_to} 기간의 리포트를 API에서 가져옵니다. 기존 데이터는 덮어씁니다." } %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @selected_account && @reports %>
+    <%# KPI 요약 %>
+    <div class="stats-grid" style="margin-bottom: 1.5rem;">
+      <div class="kpi-card">
+        <div class="kpi-label">총 노출수</div>
+        <div class="kpi-value"><%= number_with_delimiter(@totals[:impressions]) %></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">총 클릭수</div>
+        <div class="kpi-value"><%= number_with_delimiter(@totals[:clicks]) %></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">평균 CTR</div>
+        <div class="kpi-value">
+          <% ctr = @totals[:impressions] > 0 ? (@totals[:clicks].to_f / @totals[:impressions] * 100).round(2) : 0 %>
+          <%= ctr %>%
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">총 광고비</div>
+        <div class="kpi-value" style="font-size: 1.4rem;">
+          <%= number_with_delimiter(@totals[:cost]) %>원
+        </div>
+      </div>
+    </div>
+
+    <%# 일별 데이터 %>
+    <div class="card">
+      <div class="card-header"><h3>일별 성과</h3></div>
+      <% if @reports.empty? %>
+        <div class="empty-state">
+          <p>선택한 기간에 데이터가 없습니다. "API에서 가져오기" 버튼으로 데이터를 수집하세요.</p>
+        </div>
+      <% else %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>날짜</th>
+              <th>캠페인 ID</th>
+              <th>노출수</th>
+              <th>클릭수</th>
+              <th>CTR</th>
+              <th>CPC</th>
+              <th>광고비</th>
+              <th>전환수</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @reports.each do |report| %>
+              <tr>
+                <td><%= report.report_date.strftime("%Y.%m.%d") %></td>
+                <td><code style="font-size: 0.75rem;"><%= report.entity_id %></code></td>
+                <td><%= number_with_delimiter(report.impressions) %></td>
+                <td><%= number_with_delimiter(report.clicks) %></td>
+                <td><%= report.ctr %>%</td>
+                <td><%= number_with_delimiter(report.cpc) %>원</td>
+                <td><strong><%= number_with_delimiter(report.cost) %>원</strong></td>
+                <td><%= number_with_delimiter(report.conversions) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

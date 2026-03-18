@@ -1,0 +1,33 @@
+<% content_for(:title, "#{@form.name} 미리보기") %>
+<div class="public-form-container">
+  <div class="public-form-card">
+    <h1 class="public-form-title"><%= @form.name %></h1>
+    <% if @form.description.present? %>
+      <p class="public-form-description"><%= @form.description %></p>
+    <% end %>
+
+    <% @form_fields.each do |field| %>
+      <div class="form-group">
+        <label class="form-label"><%= field.label %><%= " *" if field.required? %></label>
+        <% case field.field_type %>
+        <% when "text" %>
+          <input type="text" class="form-input" disabled placeholder="<%= field.label %>">
+        <% when "email" %>
+          <input type="email" class="form-input" disabled placeholder="이메일">
+        <% when "phone" %>
+          <input type="tel" class="form-input" disabled placeholder="전화번호">
+        <% when "textarea" %>
+          <textarea class="form-textarea" disabled placeholder="<%= field.label %>"></textarea>
+        <% when "select" %>
+          <select class="form-select" disabled>
+            <option>선택하세요</option>
+          </select>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="form-actions">
+      <button class="btn-primary btn-full" disabled>제출 (미리보기)</button>
+    </div>
+  </div>
+</div>

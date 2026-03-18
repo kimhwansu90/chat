@@ -1,0 +1,71 @@
+<% content_for(:title, "#{@form.name} - LeadHub") %>
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><%= @form.name %></h1>
+    <p class="page-subtitle">
+      <code>/f/<%= @form.slug %></code>
+      &middot; 리드 <%= @leads_count %>건
+      &middot;
+      <% if @form.active? %>
+        <span class="badge badge-active">활성</span>
+      <% else %>
+        <span class="badge badge-inactive">비활성</span>
+      <% end %>
+    </p>
+  </div>
+  <div class="btn-group">
+    <%= link_to "수정", edit_admin_form_path(@form), class: "btn-secondary btn-sm" %>
+    <%= link_to "미리보기", public_form_path(form_slug: @form.slug), class: "btn-secondary btn-sm", target: "_blank" %>
+    <%= link_to "목록", admin_forms_path, class: "btn-secondary btn-sm" %>
+  </div>
+</div>
+
+<div class="dashboard-grid">
+  <div class="card">
+    <div class="card-header">폼 정보</div>
+    <div class="card-body">
+      <div class="info-row">
+        <span class="info-label">설명</span>
+        <span class="info-value"><%= @form.description || "-" %></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">감사 메시지</span>
+        <span class="info-value"><%= @form.thank_you_message %></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">리다이렉트 URL</span>
+        <span class="info-value"><%= @form.redirect_url || "-" %></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">폼 필드</div>
+    <div class="card-body">
+      <% if @form.form_fields.any? %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>라벨</th>
+              <th>필드명</th>
+              <th>유형</th>
+              <th>필수</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @form.form_fields.each do |field| %>
+              <tr>
+                <td><%= field.label %></td>
+                <td><code><%= field.name %></code></td>
+                <td><%= field.field_type %></td>
+                <td><%= field.required? ? "필수" : "-" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p class="info-text">폼 필드가 없습니다</p>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+<%= form_with model: [:admin, form], local: true do |f| %>
+  <% if form.errors.any? %>
+    <div class="form-errors">
+      <% form.errors.full_messages.each do |msg| %>
+        <p class="error-text"><%= msg %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <label class="form-label">폼 이름 *</label>
+    <%= f.text_field :name, class: "form-input", required: true, placeholder: "예: 무료 상담 신청" %>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">슬러그 (URL)</label>
+    <%= f.text_field :slug, class: "form-input", placeholder: "자동 생성됩니다 (예: free-consultation)" %>
+    <p class="info-text mt-16">폼 URL: /f/{슬러그}</p>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">설명</label>
+    <%= f.text_area :description, class: "form-textarea", placeholder: "폼 상단에 표시될 설명", rows: 3 %>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">감사 메시지</label>
+    <%= f.text_field :thank_you_message, class: "form-input", placeholder: "문의가 접수되었습니다." %>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">리다이렉트 URL (선택)</label>
+    <%= f.text_field :redirect_url, class: "form-input", placeholder: "제출 후 이동할 URL" %>
+  </div>
+
+  <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 600;">폼 필드</h3>
+
+  <div class="form-builder-fields" data-controller="form-builder">
+    <div data-form-builder-target="container">
+      <% form.form_fields.each_with_index do |field, index| %>
+        <%= f.fields_for :form_fields, field, index: index do |ff| %>
+          <div class="form-field-row" data-form-builder-target="field">
+            <%= ff.text_field :label, placeholder: "라벨", required: true %>
+            <%= ff.select :field_type, FormField::FIELD_TYPES.map { |t| [t, t] } %>
+            <%= ff.text_field :name, placeholder: "필드명 (영문)" %>
+            <label class="form-checkbox">
+              <%= ff.check_box :required %> 필수
+            </label>
+            <%= ff.hidden_field :position, value: index %>
+            <button type="button" class="btn-remove-field" data-action="click->form-builder#removeField">&times;</button>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <button type="button" class="btn-secondary btn-sm" data-action="click->form-builder#addField"
+            data-form-builder-target="addBtn">
+      + 필드 추가
+    </button>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit form.persisted? ? "수정" : "생성", class: "btn-primary" %>
+    <%= link_to "취소", admin_forms_path, class: "btn-secondary" %>
+  </div>
+<% end %>

@@ -1,10 +1,9 @@
 module Admin
   class DashboardController < BaseController
     def index
-      @total_users = User.where.not(role: "admin").count
-      @today_messages = Message.where("created_at >= ?", Time.current.beginning_of_day).count
-      @conversations = Conversation.includes(:user).order(last_message_at: :desc)
-      @nicknames = User.pluck(:username, :nickname).to_h
+      @stats = LeadStatsQuery.new.call(date_from: 30.days.ago.to_date, date_to: Date.today)
+      @recent_leads = Lead.includes(:assigned_to, :form).recent.limit(10)
+      @sales_rep_stats = @stats[:by_sales_rep].first(5)
     end
   end
 end

@@ -1,0 +1,61 @@
+<% content_for(:title, "리드 리포트 - LeadHub") %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">리드 리포트</h1>
+    <p class="page-subtitle"><%= @date_from.strftime("%Y.%m.%d") %> ~ <%= @date_to.strftime("%Y.%m.%d") %> — 총 <%= @leads.size %>건</p>
+  </div>
+  <%= link_to "← 리포트 홈", admin_reports_path(date_from: @date_from, date_to: @date_to), class: "btn btn-secondary" %>
+</div>
+
+<div class="stats-grid" style="margin-bottom: 1.5rem;">
+  <div class="kpi-card">
+    <div class="kpi-label">전체 리드</div>
+    <div class="kpi-value"><%= @stats[:total] %></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">전환</div>
+    <div class="kpi-value"><%= @stats[:by_status]["converted"] || 0 %></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">전환율</div>
+    <div class="kpi-value"><%= @stats[:conversion_rate] %>%</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">실패</div>
+    <div class="kpi-value"><%= @stats[:by_status]["lost"] || 0 %></div>
+  </div>
+</div>
+
+<div class="card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>이름</th>
+        <th>연락처</th>
+        <th>상태</th>
+        <th>채널</th>
+        <th>캠페인</th>
+        <th>담당자</th>
+        <th>등록일</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @leads.each do |lead| %>
+        <tr>
+          <td><%= link_to lead.name, admin_lead_path(lead) %></td>
+          <td><%= lead.phone %></td>
+          <td>
+            <span class="badge badge-<%= lead.status == 'converted' ? 'success' : lead.status == 'lost' ? 'danger' : 'info' %>">
+              <%= Lead::STATUS_LABELS[lead.status] %>
+            </span>
+          </td>
+          <td><%= lead.utm_source.presence || "-" %></td>
+          <td><%= lead.utm_campaign.presence || "-" %></td>
+          <td><%= lead.assigned_to&.nickname || "-" %></td>
+          <td><%= lead.created_at.strftime("%Y.%m.%d") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

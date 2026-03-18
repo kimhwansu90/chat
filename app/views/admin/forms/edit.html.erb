@@ -1,0 +1,11 @@
+<% content_for(:title, "폼 수정 - LeadHub") %>
+<div class="admin-form-page">
+  <div class="page-header">
+    <h1 class="page-title">폼 수정</h1>
+    <%= link_to "상세", admin_form_path(@form), class: "btn-secondary btn-sm" %>
+  </div>
+
+  <div class="admin-form-card">
+    <%= render "form", form: @form %>
+  </div>
+</div>

@@ -1,81 +1,143 @@
-<div class="admin-page">
-  <h1 class="admin-page-title">대시보드</h1>
+<% content_for(:title, "대시보드 - LeadHub") %>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">대시보드</h1>
+    <p class="page-subtitle">최근 30일 리드 현황</p>
+  </div>
+  <div style="display: flex; gap: 0.5rem;">
+    <%= link_to "리포트", admin_reports_path, class: "btn btn-secondary btn-sm" %>
+    <%= link_to "+ 리드 등록", new_admin_lead_path, class: "btn btn-primary btn-sm" %>
+  </div>
+</div>
 
-  <!-- 통계 카드 -->
-  <div class="admin-stats">
-    <div class="stat-card">
-      <div class="stat-icon">👥</div>
-      <div class="stat-info">
-        <div class="stat-value"><%= @total_users %></div>
-        <div class="stat-label">전체 사용자</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">💬</div>
-      <div class="stat-info">
-        <div class="stat-value"><%= @today_messages %></div>
-        <div class="stat-label">오늘 메시지</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">🟢</div>
-      <div class="stat-info">
-        <div class="stat-value" id="online-count"><%= @online_users.size %></div>
-        <div class="stat-label">접속자</div>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">🚨</div>
-      <div class="stat-info">
-        <div class="stat-value" id="pending-reports"><%= @pending_reports %></div>
-        <div class="stat-label">미처리 신고</div>
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">30일 리드</div>
+    <div class="kpi-value"><%= @stats[:total] %></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">오늘 신규</div>
+    <div class="kpi-value"><%= @stats[:today] %></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">전환율</div>
+    <div class="kpi-value"><%= @stats[:conversion_rate] %>%</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">미배정 리드</div>
+    <div class="kpi-value"><%= @stats[:unassigned] %></div>
+  </div>
+</div>
+
+<div class="dashboard-grid">
+  <div class="card">
+    <div class="card-header">파이프라인 현황</div>
+    <div class="card-body">
+      <div class="bar-chart">
+        <% max_count = @stats[:by_status].values.max || 1 %>
+        <% Lead::STATUSES.each do |status| %>
+          <% count = @stats[:by_status][status] || 0 %>
+          <div class="bar-chart-row">
+            <span class="bar-chart-label"><%= Lead::STATUS_LABELS[status] %></span>
+            <div class="bar-chart-track">
+              <div class="bar-chart-fill" style="width: <%= [(count.to_f / max_count * 100).round, 5].max %>%">
+                <%= count %>
+              </div>
+            </div>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>
 
-  <!-- 실시간 접속자 -->
-  <div class="admin-section">
-    <h2 class="admin-section-title">실시간 접속자</h2>
-    <div class="admin-online-users" id="online-users-list">
-      <% if @online_users.any? %>
-        <% @online_users.each do |username| %>
-          <span class="online-user-tag"><%= @nicknames[username] || username %> (<%= username %>)</span>
-        <% end %>
+  <div class="card">
+    <div class="card-header">채널별 리드</div>
+    <div class="card-body">
+      <% if @stats[:by_channel].any? %>
+        <div class="bar-chart">
+          <% source_max = @stats[:by_channel].values.max || 1 %>
+          <% @stats[:by_channel].each do |source, count| %>
+            <div class="bar-chart-row">
+              <span class="bar-chart-label"><%= source %></span>
+              <div class="bar-chart-track">
+                <div class="bar-chart-fill" style="width: <%= [(count.to_f / source_max * 100).round, 5].max %>%; background: var(--sub);">
+                  <%= count %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
       <% else %>
-        <p class="admin-empty">접속자가 없습니다.</p>
+        <p class="info-text">아직 채널 데이터가 없습니다</p>
       <% end %>
     </div>
   </div>
 
-  <!-- 최근 메시지 -->
-  <div class="admin-section">
-    <h2 class="admin-section-title">최근 메시지</h2>
-    <div class="admin-table-wrapper">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>시간</th>
-            <th>발신자</th>
-            <th>내용</th>
-            <th>유형</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @recent_messages.each do |msg| %>
+  <% if @sales_rep_stats.any? %>
+    <div class="card">
+      <div class="card-header">영업사원 리더보드</div>
+      <div class="card-body" style="padding: 0;">
+        <table class="data-table">
+          <thead>
             <tr>
-              <td><%= msg.created_at.strftime("%m/%d %H:%M") %></td>
-              <td><%= @nicknames[msg.username] || msg.username %></td>
-              <td class="admin-msg-content">
-                <% if msg.image.attached? %>
-                  [이미지]
-                <% end %>
-                <%= truncate(msg.content || "", length: 50) %>
-              </td>
-              <td><span class="admin-tag admin-tag-<%= msg.message_type %>"><%= msg.message_type %></span></td>
+              <th>영업사원</th>
+              <th>리드</th>
+              <th>계약</th>
+              <th>전환율</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <% @sales_rep_stats.each_with_index do |rep, idx| %>
+              <tr>
+                <td>
+                  <% if idx == 0 %><span style="margin-right: 0.25rem;">🥇</span><% end %>
+                  <%= rep[:name] %>
+                </td>
+                <td><%= rep[:total] %></td>
+                <td><%= rep[:converted] %></td>
+                <td><%= rep[:conversion_rate] %>%</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="card <%= @sales_rep_stats.any? ? '' : 'dashboard-full' %>">
+    <div class="card-header">최근 리드</div>
+    <div class="card-body" style="padding: 0;">
+      <% if @recent_leads.any? %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>이름</th>
+              <th>연락처</th>
+              <th>상태</th>
+              <th>유입 채널</th>
+              <th>담당자</th>
+              <th>등록일</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_leads.each do |lead| %>
+              <tr>
+                <td><%= link_to lead.name, admin_lead_path(lead), style: "color: var(--primary); font-weight: 600; text-decoration: none;" %></td>
+                <td><%= lead.phone || "-" %></td>
+                <td><span class="badge badge-<%= lead.status %>"><%= lead.status_label %></span></td>
+                <td><%= lead.utm_source || "-" %></td>
+                <td><%= lead.assigned_to&.nickname || "미배정" %></td>
+                <td><%= lead.created_at.strftime("%m/%d %H:%M") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="empty-state">
+          <p class="empty-state-text">아직 등록된 리드가 없습니다</p>
+          <%= link_to "첫 리드 등록하기", new_admin_lead_path, class: "btn btn-primary btn-sm" %>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>

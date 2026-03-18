@@ -1,0 +1,58 @@
+<% content_for(:title, "문의 폼 - LeadHub") %>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">문의 폼</h1>
+    <p class="page-subtitle">광고 랜딩 페이지용 문의 폼 관리</p>
+  </div>
+  <%= link_to "폼 생성", new_admin_form_path, class: "btn-primary btn-sm" %>
+</div>
+
+<% if @forms.any? %>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>이름</th>
+          <th>URL</th>
+          <th>리드 수</th>
+          <th>상태</th>
+          <th>생성자</th>
+          <th>생성일</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @forms.each do |form| %>
+          <tr>
+            <td><%= link_to form.name, admin_form_path(form), style: "color: var(--primary); font-weight: 600; text-decoration: none;" %></td>
+            <td><code style="font-size: 12px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px;">/f/<%= form.slug %></code></td>
+            <td><%= form.leads.count %></td>
+            <td>
+              <% if form.active? %>
+                <span class="badge badge-active">활성</span>
+              <% else %>
+                <span class="badge badge-inactive">비활성</span>
+              <% end %>
+            </td>
+            <td><%= form.created_by&.nickname || "-" %></td>
+            <td><%= form.created_at.strftime("%Y-%m-%d") %></td>
+            <td>
+              <div class="btn-group">
+                <%= link_to "미리보기", preview_admin_form_path(form), class: "btn-secondary btn-sm", target: "_blank" %>
+                <%= button_to form.active? ? "비활성화" : "활성화",
+                    toggle_active_admin_form_path(form),
+                    method: :patch,
+                    class: form.active? ? "btn-warning btn-sm" : "btn-success btn-sm" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <div class="empty-state">
+    <p class="empty-state-text">아직 생성된 폼이 없습니다</p>
+    <%= link_to "첫 폼 만들기", new_admin_form_path, class: "btn-primary btn-sm" %>
+  </div>
+<% end %>

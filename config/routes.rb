@@ -5,25 +5,53 @@ Rails.application.routes.draw do
   post   "login",  to: "sessions#create"
   delete "logout", to: "sessions#destroy"
 
-  resources :conversations, only: [:index, :show] do
-    resources :messages, only: [:create], controller: "conversations/messages"
-    member do
-      post :mark_read
-    end
+  # Public inquiry forms
+  scope :f do
+    get ":form_slug", to: "public/submissions#new", as: :public_form
+    post ":form_slug", to: "public/submissions#create", as: :public_form_submit
+    get ":form_slug/thank-you", to: "public/submissions#thank_you", as: :thank_you
   end
 
   namespace :admin do
-    root to: "conversations#index"
-    resources :conversations, only: [:index, :show]
-    resources :users, only: [:index, :new, :create] do
+    root to: "dashboard#index"
+
+    resources :leads do
       member do
-        patch :update_nickname
-        post :ban
-        post :unban
-        post :kick
+        patch :update_status
+        post :assign
+      end
+      resources :activities, only: [:create], controller: "lead_activities"
+    end
+
+    resources :forms do
+      member do
+        get :preview
+        patch :toggle_active
       end
     end
-    resources :messages, only: [:index, :destroy]
+
+    resources :users, only: [:index, :new, :create, :edit, :update]
+
+    resources :nad_accounts do
+      member do
+        post :sync
+      end
+    end
+
+    resources :nad_campaigns, only: [:index, :show]
+    resources :nad_reports, only: [:index] do
+      collection do
+        post :fetch
+      end
+    end
+
+    resources :reports, only: [:index] do
+      collection do
+        get :lead_report
+        get :channel_report
+        get :team_report
+      end
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

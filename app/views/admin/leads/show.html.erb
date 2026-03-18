@@ -1,0 +1,163 @@
+<% content_for(:title, "#{@lead.name} - LeadHub") %>
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><%= @lead.name %></h1>
+    <p class="page-subtitle">
+      <span class="badge badge-<%= @lead.status %>"><%= @lead.status_label %></span>
+      <% if @lead.form %>
+        &middot; <%= @lead.form.name %>
+      <% end %>
+    </p>
+  </div>
+  <div class="btn-group">
+    <%= link_to "수정", edit_admin_lead_path(@lead), class: "btn-secondary btn-sm" %>
+    <%= link_to "목록", admin_leads_path, class: "btn-secondary btn-sm" %>
+  </div>
+</div>
+
+<div class="lead-detail-layout">
+  <div class="lead-info-section">
+    <div class="card">
+      <div class="card-header">기본 정보</div>
+      <div class="card-body">
+        <div class="info-row">
+          <span class="info-label">이름</span>
+          <span class="info-value"><%= @lead.name %></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">전화번호</span>
+          <span class="info-value"><%= @lead.phone || "-" %></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">이메일</span>
+          <span class="info-value"><%= @lead.email || "-" %></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">등록일</span>
+          <span class="info-value"><%= @lead.created_at.strftime("%Y-%m-%d %H:%M") %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">유입 정보</div>
+      <div class="card-body">
+        <div class="info-row">
+          <span class="info-label">소스</span>
+          <span class="info-value"><%= @lead.utm_source || "-" %></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">매체</span>
+          <span class="info-value"><%= @lead.utm_medium || "-" %></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">캠페인</span>
+          <span class="info-value"><%= @lead.utm_campaign || "-" %></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">랜딩 페이지</span>
+          <span class="info-value" style="font-size: 12px; word-break: break-all;"><%= @lead.landing_page_url || "-" %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">상태 변경</div>
+      <div class="card-body">
+        <div class="btn-group">
+          <% Lead::STATUSES.each do |status| %>
+            <% if status != @lead.status %>
+              <%= button_to Lead::STATUS_LABELS[status],
+                  update_status_admin_lead_path(@lead, status: status),
+                  method: :patch,
+                  class: "btn-secondary btn-sm" %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">담당자 배정</div>
+      <div class="card-body">
+        <p style="margin-bottom: 12px; font-size: 14px;">
+          현재: <strong><%= @lead.assigned_to&.nickname || "미배정" %></strong>
+        </p>
+        <div class="btn-group">
+          <% @sales_reps.each do |rep| %>
+            <% next if rep.id == @lead.assigned_to_id %>
+            <%= button_to rep.nickname,
+                assign_admin_lead_path(@lead, sales_rep_id: rep.id),
+                method: :post,
+                class: "btn-secondary btn-sm" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <% if @lead.custom_fields.present? && @lead.custom_fields.any? %>
+      <div class="card">
+        <div class="card-header">추가 정보</div>
+        <div class="card-body">
+          <% @lead.custom_fields.each do |key, value| %>
+            <% next if %w[name phone email].include?(key) %>
+            <div class="info-row">
+              <span class="info-label"><%= key %></span>
+              <span class="info-value"><%= value %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="lead-info-section">
+    <div class="card">
+      <div class="card-header">메모 추가</div>
+      <div class="card-body">
+        <%= form_with model: LeadActivity.new, url: admin_lead_activities_path(@lead), method: :post do |f| %>
+          <%= f.hidden_field :activity_type, value: "note" %>
+          <div class="form-group">
+            <textarea name="lead_activity[content]" class="form-textarea" placeholder="메모를 입력하세요..." rows="3" required></textarea>
+          </div>
+          <div class="form-actions">
+            <%= f.submit "메모 추가", class: "btn-primary btn-sm" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">활동 기록</div>
+      <div class="card-body">
+        <% if @activities.any? %>
+          <div class="activity-timeline">
+            <% @activities.each do |activity| %>
+              <div class="activity-item">
+                <div class="activity-dot <%= activity.activity_type %>">
+                  <%= case activity.activity_type
+                      when "status_change" then raw("&#8594;")
+                      when "note" then raw("&#9998;")
+                      when "call" then raw("&#9742;")
+                      when "assignment" then raw("&#8644;")
+                      else raw("&#8226;")
+                      end %>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-text"><%= activity.content %></div>
+                  <div class="activity-meta">
+                    <%= activity.user&.nickname || "시스템" %>
+                    &middot;
+                    <%= activity.created_at.strftime("%m/%d %H:%M") %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="info-text">아직 활동 기록이 없습니다</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
