@@ -63,10 +63,12 @@ module Admin
       new_status = params[:status]
       if Lead::STATUSES.include?(new_status)
         @lead.change_status!(new_status, user: current_user_record)
-        head :ok
+        render json: { ok: true, status: new_status }
       else
-        head :unprocessable_entity
+        render json: { ok: false, error: "invalid status" }, status: :unprocessable_entity
       end
+    rescue => e
+      render json: { ok: false, error: e.message }, status: :internal_server_error
     end
 
     def assign

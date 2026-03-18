@@ -25,10 +25,12 @@ export default class extends Controller {
   }
 
   dragLeave(event) {
-    event.currentTarget.classList.remove("drag-over")
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      event.currentTarget.classList.remove("drag-over")
+    }
   }
 
-  drop(event) {
+  async drop(event) {
     event.preventDefault()
     const column = event.currentTarget
     column.classList.remove("drag-over")
@@ -37,9 +39,16 @@ export default class extends Controller {
     const newStatus = column.dataset.status
     const card = document.getElementById(`lead_${leadId}`)
 
-    if (card) {
-      column.appendChild(card)
-      this.updateLeadStatus(leadId, newStatus)
+    if (!card || !leadId || !newStatus) return
+
+    const originalParent = card.parentElement
+    column.appendChild(card)
+
+    const ok = await this.updateLeadStatus(leadId, newStatus)
+    if (!ok) {
+      originalParent.appendChild(card)
+    } else {
+      this.updateColumnCounts()
     }
   }
 
@@ -51,16 +60,31 @@ export default class extends Controller {
         method: "PATCH",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          "X-CSRF-Token": csrfToken
+          "X-CSRF-Token": csrfToken,
+          "Accept": "application/json"
         },
-        body: `status=${newStatus}`
+        body: `status=${encodeURIComponent(newStatus)}`
       })
 
-      if (!response.ok) {
-        window.location.reload()
+      if (response.ok) {
+        return true
+      } else {
+        const data = await response.json().catch(() => ({}))
+        console.error("Status update failed:", data.error || response.status)
+        return false
       }
     } catch (error) {
-      window.location.reload()
+      console.error("Network error:", error)
+      return false
     }
+  }
+
+  updateColumnCounts() {
+    this.columnTargets.forEach(column => {
+      const header = column.closest(".pipeline-column")?.querySelector(".pipeline-column-count")
+      if (header) {
+        header.textContent = column.querySelectorAll(".lead-card").length
+      }
+    })
   }
 }
