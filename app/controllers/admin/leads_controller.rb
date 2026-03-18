@@ -81,7 +81,7 @@ module Admin
       @lead.activities.create!(
         activity_type: "note",
         user: current_user_record,
-        content: "계약금액 #{number_with_delimiter(value)}원 입력"
+        content: "계약금액 #{ActiveSupport::NumberHelper.number_to_delimited(value)}원 입력"
       )
       redirect_to admin_lead_path(@lead), notice: "계약금액이 저장되었습니다."
     end
