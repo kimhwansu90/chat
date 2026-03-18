@@ -50,6 +50,7 @@
     <%= link_to "📣 채널 분석", channel_report_admin_reports_path(date_from: @date_from, date_to: @date_to), class: "btn btn-secondary" %>
     <%= link_to "👥 팀 성과", team_report_admin_reports_path(date_from: @date_from, date_to: @date_to), class: "btn btn-secondary" %>
     <%= link_to "📡 광고 리포트", admin_nad_reports_path, class: "btn btn-secondary" %>
+    <%= link_to "💰 ROI 결과 리포트", roi_report_admin_reports_path(date_from: @date_from, date_to: @date_to), class: "btn-primary btn-sm" %>
   </div>
 </div>
 

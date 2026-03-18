@@ -18,6 +18,8 @@ class Lead < ApplicationRecord
   scope :by_status, ->(status) { where(status: status) }
   scope :unassigned, -> { where(assigned_to: nil) }
   scope :recent, -> { order(created_at: :desc) }
+  scope :converted, -> { where(status: "converted") }
+  scope :with_contract, -> { where.not(contract_value: [nil, 0]) }
 
   def status_label
     STATUS_LABELS[status]
@@ -27,7 +29,10 @@ class Lead < ApplicationRecord
     return if status == new_status
 
     old_status = status
-    update!(status: new_status)
+    attrs = { status: new_status }
+    attrs[:contracted_at] = Time.current if new_status == "converted" && contracted_at.nil?
+
+    update!(attrs)
     activities.create!(
       activity_type: "status_change",
       user: user,
@@ -43,5 +48,10 @@ class Lead < ApplicationRecord
       user: assigned_by,
       content: "#{sales_rep.nickname}에게 배정"
     )
+  end
+
+  def contract_value_won
+    return 0 if contract_value.nil?
+    contract_value
   end
 end

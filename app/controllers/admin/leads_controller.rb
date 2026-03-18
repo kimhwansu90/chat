@@ -1,6 +1,6 @@
 module Admin
   class LeadsController < BaseController
-    before_action :set_lead, only: [:show, :edit, :update, :destroy, :update_status, :assign]
+    before_action :set_lead, only: [:show, :edit, :update, :destroy, :update_status, :assign, :update_contract]
 
     def index
       @leads_by_status = Lead::STATUSES.each_with_object({}) do |status, hash|
@@ -75,6 +75,17 @@ module Admin
       redirect_to admin_lead_path(@lead), notice: "#{sales_rep.nickname}에게 배정되었습니다."
     end
 
+    def update_contract
+      value = params[:contract_value].to_s.gsub(/[^0-9]/, "").to_i
+      @lead.update!(contract_value: value, contracted_at: @lead.contracted_at || Time.current)
+      @lead.activities.create!(
+        activity_type: "note",
+        user: current_user_record,
+        content: "계약금액 #{number_with_delimiter(value)}원 입력"
+      )
+      redirect_to admin_lead_path(@lead), notice: "계약금액이 저장되었습니다."
+    end
+
     private
 
     def set_lead
@@ -83,7 +94,7 @@ module Admin
 
     def lead_params
       params.require(:lead).permit(:name, :phone, :email, :status, :form_id, :assigned_to_id,
-                                   :utm_source, :utm_medium, :utm_campaign)
+                                   :utm_source, :utm_medium, :utm_campaign, :contract_value)
     end
   end
 end

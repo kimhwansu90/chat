@@ -19,6 +19,7 @@ Rails.application.routes.draw do
       member do
         patch :update_status
         post :assign
+        patch :update_contract
       end
       resources :activities, only: [:create], controller: "lead_activities"
     end
@@ -50,6 +51,7 @@ Rails.application.routes.draw do
         get :lead_report
         get :channel_report
         get :team_report
+        get :roi_report
       end
     end
   end

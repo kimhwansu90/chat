@@ -2,6 +2,9 @@
   <label class="pf-label">
     <% if field.required? %><span class="pf-required">*</span> <% end %><%= field.label %>
   </label>
+  <% if field.subtitle.present? && !%w[textarea select].include?(field.field_type) %>
+    <p class="pf-field-subtitle"><%= field.subtitle %></p>
+  <% end %>
 
   <% case field.field_type %>
   <% when "text" %>
@@ -45,5 +48,19 @@
         <% end %>
       <% end %>
     </select>
+  <% when "button_select" %>
+    <%# 버튼형 단일 선택 (라디오 버튼 스타일) %>
+    <div class="pf-btn-select-group" data-field="<%= field.name %>">
+      <% if field.options.present? %>
+        <% field.options.split(",").each do |opt| %>
+          <% opt = opt.strip %>
+          <label class="pf-btn-option">
+            <input type="radio" name="lead[<%= field.name %>]"
+                   value="<%= opt %>" <%= "required" if field.required? %> style="display:none;">
+            <span><%= opt %></span>
+          </label>
+        <% end %>
+      <% end %>
+    </div>
   <% end %>
 </div>

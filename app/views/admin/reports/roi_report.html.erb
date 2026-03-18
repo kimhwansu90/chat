@@ -1,0 +1,191 @@
+<% content_for(:title, "ROI 리포트 - HS Solution") %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">ROI 결과 리포트</h1>
+    <p class="page-subtitle">광고비 지출 대비 매출 및 순이익 분석</p>
+  </div>
+  <div>
+    <%= link_to "← 리포트", admin_reports_path, class: "btn-secondary btn-sm" %>
+  </div>
+</div>
+
+<%# 날짜 필터 %>
+<div class="card" style="margin-bottom: 24px;">
+  <%= form_with url: roi_report_admin_reports_path, method: :get, local: true,
+      style: "display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; padding: 16px;" do |f| %>
+    <div>
+      <label class="form-label" style="margin-bottom: 4px;">시작일</label>
+      <input type="date" name="date_from" value="<%= @date_from %>" class="form-input" style="width: 160px;">
+    </div>
+    <div>
+      <label class="form-label" style="margin-bottom: 4px;">종료일</label>
+      <input type="date" name="date_to" value="<%= @date_to %>" class="form-input" style="width: 160px;">
+    </div>
+    <button type="submit" class="btn-primary">조회</button>
+  <% end %>
+</div>
+
+<%# 핵심 KPI %>
+<div class="kpi-grid" style="grid-template-columns: repeat(5, 1fr); margin-bottom: 24px;">
+  <div class="kpi-card">
+    <div class="kpi-label">총 광고비</div>
+    <div class="kpi-value" style="font-size: 20px; color: var(--danger);">
+      <%= number_with_delimiter(@total_ad_spend) %>원
+    </div>
+    <div class="kpi-change">네이버 광고 기준</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">총 매출</div>
+    <div class="kpi-value" style="font-size: 20px; color: var(--success);">
+      <%= number_with_delimiter(@total_revenue) %>원
+    </div>
+    <div class="kpi-change">계약 완료 기준</div>
+  </div>
+  <div class="kpi-card" style="<%= @net_profit >= 0 ? 'border-top: 3px solid var(--success)' : 'border-top: 3px solid var(--danger)' %>">
+    <div class="kpi-label">순이익</div>
+    <div class="kpi-value" style="font-size: 20px; color: <%= @net_profit >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
+      <%= @net_profit >= 0 ? "+" : "" %><%= number_with_delimiter(@net_profit) %>원
+    </div>
+    <div class="kpi-change">매출 - 광고비</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">ROI</div>
+    <div class="kpi-value" style="font-size: 20px; color: <%= @roi_percent >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
+      <%= @roi_percent >= 0 ? "+" : "" %><%= @roi_percent %>%
+    </div>
+    <div class="kpi-change">(매출/광고비 - 1) × 100</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">전환율</div>
+    <div class="kpi-value" style="font-size: 20px;">
+      <%= @total_leads > 0 ? (@total_converted.to_f / @total_leads * 100).round(1) : 0 %>%
+    </div>
+    <div class="kpi-change"><%= @total_converted %> / <%= @total_leads %>건</div>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+  <%# 캠페인별 ROI %>
+  <div class="card">
+    <div class="card-header">📣 캠페인별 성과 (UTM 기준)</div>
+    <div class="card-body" style="padding: 0;">
+      <% if @by_campaign.any? %>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>캠페인</th>
+              <th style="text-align: right;">리드</th>
+              <th style="text-align: right;">계약</th>
+              <th style="text-align: right;">매출</th>
+              <th style="text-align: right;">광고비</th>
+              <th style="text-align: right;">순이익</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @by_campaign.each do |c| %>
+              <tr>
+                <td style="font-size: 13px;"><%= c[:name] %></td>
+                <td style="text-align: right;"><%= c[:leads] %></td>
+                <td style="text-align: right;">
+                  <%= c[:converted] %>
+                  <span style="font-size: 11px; color: var(--text-secondary);">(<%= c[:conversion_rate] %>%)</span>
+                </td>
+                <td style="text-align: right; color: var(--success); font-weight: 600;">
+                  <%= number_with_delimiter(c[:revenue]) %>
+                </td>
+                <td style="text-align: right; color: var(--danger);">
+                  <%= c[:ad_spend] > 0 ? number_with_delimiter(c[:ad_spend]) : "-" %>
+                </td>
+                <td style="text-align: right; font-weight: 700;
+                    color: <%= c[:net_profit] >= 0 ? 'var(--success)' : 'var(--danger)' %>;">
+                  <%= c[:net_profit] >= 0 ? "+" : "" %><%= number_with_delimiter(c[:net_profit]) %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="empty-state">
+          <p class="empty-state-text">해당 기간에 계약 완료 리드가 없습니다</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# 채널별 매출 %>
+  <div class="card">
+    <div class="card-header">📊 채널별 매출</div>
+    <div class="card-body">
+      <% if @by_source.any? %>
+        <% max_revenue = @by_source.map { |_, v| v }.max.to_f.nonzero? || 1 %>
+        <% @by_source.each do |source, revenue| %>
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="font-size: 14px; font-weight: 500;"><%= source %></span>
+              <span style="font-size: 14px; font-weight: 700; color: var(--success);">
+                <%= number_with_delimiter(revenue.to_i) %>원
+              </span>
+            </div>
+            <div class="bar-chart-track">
+              <div class="bar-chart-fill"
+                   style="width: <%= (revenue.to_f / max_revenue * 100).round %>%; background: var(--success);">
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="info-text">채널별 매출 데이터 없음</p>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%# 최근 계약 리스트 %>
+<div class="card">
+  <div class="card-header">✅ 기간 내 계약 완료 리드</div>
+  <% if @recent_contracts.any? %>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>이름</th>
+          <th>전화번호</th>
+          <th>캠페인</th>
+          <th>담당자</th>
+          <th style="text-align: right;">계약금액</th>
+          <th>계약일</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @recent_contracts.each do |lead| %>
+          <tr>
+            <td>
+              <%= link_to lead.name, admin_lead_path(lead),
+                  style: "color: var(--primary); text-decoration: none; font-weight: 500;" %>
+            </td>
+            <td><%= lead.phone || "-" %></td>
+            <td><%= lead.utm_campaign || lead.utm_source || "-" %></td>
+            <td><%= lead.assigned_to&.nickname || "미배정" %></td>
+            <td style="text-align: right; font-weight: 700; color: var(--success);">
+              <%= number_with_delimiter(lead.contract_value.to_i) %>원
+            </td>
+            <td><%= lead.contracted_at&.strftime("%Y-%m-%d") || "-" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr style="background: var(--bg-secondary);">
+          <td colspan="4" style="font-weight: 700; padding: 12px 16px;">합계</td>
+          <td style="text-align: right; font-weight: 700; color: var(--success); padding: 12px 16px;">
+            <%= number_with_delimiter(@recent_contracts.sum { |l| l.contract_value.to_i }) %>원
+          </td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  <% else %>
+    <div class="empty-state">
+      <p class="empty-state-text">해당 기간에 계약 완료 리드가 없습니다</p>
+    </div>
+  <% end %>
+</div>

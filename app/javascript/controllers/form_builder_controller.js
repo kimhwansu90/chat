@@ -42,6 +42,7 @@ export default class extends Controller {
               <option value="select">드롭다운</option>
               <option value="textarea">텍스트박스</option>
               <option value="privacy_checkbox">개인정보동의</option>
+              <option value="button_select">버튼선택</option>
             </select>
           </div>
           <div>

@@ -7,6 +7,9 @@
       <% if @lead.form %>
         &middot; <%= @lead.form.name %>
       <% end %>
+      <% if @lead.contract_value.to_i > 0 %>
+        &middot; <strong style="color: var(--success);">계약 <%= number_with_delimiter(@lead.contract_value) %>원</strong>
+      <% end %>
     </p>
   </div>
   <div class="btn-group">
@@ -58,6 +61,41 @@
           <span class="info-label">랜딩 페이지</span>
           <span class="info-value" style="font-size: 12px; word-break: break-all;"><%= @lead.landing_page_url || "-" %></span>
         </div>
+      </div>
+    </div>
+
+    <%# 계약 정보 카드 %>
+    <div class="card" style="border-left: 4px solid var(--success);">
+      <div class="card-header" style="color: var(--success);">💰 계약 정보</div>
+      <div class="card-body">
+        <% if @lead.contract_value.to_i > 0 %>
+          <div class="info-row">
+            <span class="info-label">계약금액</span>
+            <span class="info-value" style="font-size: 18px; font-weight: 700; color: var(--success);">
+              <%= number_with_delimiter(@lead.contract_value) %>원
+            </span>
+          </div>
+          <% if @lead.contracted_at %>
+            <div class="info-row">
+              <span class="info-label">계약일</span>
+              <span class="info-value"><%= @lead.contracted_at.strftime("%Y-%m-%d") %></span>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="info-text" style="margin-bottom: 12px;">계약 완료 시 금액을 입력하세요.</p>
+        <% end %>
+
+        <%= form_with url: update_contract_admin_lead_path(@lead), method: :patch, local: true,
+            style: "display: flex; gap: 8px; margin-top: 12px;" do |f| %>
+          <div style="flex: 1; position: relative;">
+            <input type="number" name="contract_value"
+                   value="<%= @lead.contract_value.to_i > 0 ? @lead.contract_value : "" %>"
+                   class="form-input" placeholder="계약금액 (원)" min="0" step="10000"
+                   style="padding-right: 32px;">
+            <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 13px;">원</span>
+          </div>
+          <button type="submit" class="btn-success">저장</button>
+        <% end %>
       </div>
     </div>
 

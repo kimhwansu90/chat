@@ -694,3 +694,42 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* === Button Select Field (공개 폼) === */
+.pf-btn-select-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pf-btn-option {
+  cursor: pointer;
+}
+
+.pf-btn-option input[type="radio"]:checked + span {
+  background: #2c3356;
+  color: white;
+  border-color: #2c3356;
+}
+
+.pf-btn-option span {
+  display: inline-block;
+  padding: 10px 18px;
+  border: 1.5px solid #ddd;
+  border-radius: 30px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #333;
+  background: white;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.pf-btn-option span:hover {
+  border-color: #2c3356;
+  color: #2c3356;
+}
+
+/* === ROI Report === */
+.roi-positive { color: var(--success); font-weight: 700; }
+.roi-negative { color: var(--danger); font-weight: 700; }
