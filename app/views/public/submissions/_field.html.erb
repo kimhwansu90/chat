@@ -1,0 +1,49 @@
+<div class="pf-field-group">
+  <label class="pf-label">
+    <% if field.required? %><span class="pf-required">*</span> <% end %><%= field.label %>
+  </label>
+
+  <% case field.field_type %>
+  <% when "text" %>
+    <input type="text"
+           name="lead[<%= field.name %>]"
+           class="pf-input"
+           placeholder="<%= field.placeholder.presence || field.label %>"
+           <%= "required" if field.required? %>>
+  <% when "email" %>
+    <input type="email"
+           name="lead[<%= field.name %>]"
+           class="pf-input"
+           placeholder="<%= field.placeholder.presence || "이메일 주소" %>"
+           <%= "required" if field.required? %>>
+  <% when "phone" %>
+    <input type="tel"
+           name="lead[<%= field.name %>]"
+           class="pf-input"
+           placeholder="<%= field.placeholder.presence || "연락처" %>"
+           <%= "required" if field.required? %>>
+  <% when "textarea" %>
+    <% if field.subtitle.present? %>
+      <p class="pf-field-subtitle"><%= field.subtitle %></p>
+    <% end %>
+    <textarea name="lead[<%= field.name %>]"
+              class="pf-textarea"
+              rows="5"
+              placeholder="<%= field.placeholder.presence || "" %>"
+              <%= "required" if field.required? %>></textarea>
+  <% when "select" %>
+    <% if field.subtitle.present? %>
+      <p class="pf-field-subtitle"><%= field.subtitle %></p>
+    <% end %>
+    <select name="lead[<%= field.name %>]"
+            class="pf-select"
+            <%= "required" if field.required? %>>
+      <option value="">선택해 주세요.</option>
+      <% if field.options.present? %>
+        <% field.options.split(",").each do |opt| %>
+          <option value="<%= opt.strip %>"><%= opt.strip %></option>
+        <% end %>
+      <% end %>
+    </select>
+  <% end %>
+</div>

@@ -3,6 +3,8 @@ module Public
     skip_before_action :update_last_seen
     layout "public"
 
+    rescue_from ActiveRecord::RecordNotFound, with: :form_not_found
+
     def new
       @form = Form.active.find_by!(slug: params[:form_slug])
       @form_fields = @form.form_fields
@@ -14,11 +16,12 @@ module Public
 
       custom_fields = {}
       @form_fields.each do |field|
+        next if field.field_type == "privacy_checkbox"
         custom_fields[field.name] = params.dig(:lead, field.name)
       end
 
       @lead = Lead.new(
-        name: params.dig(:lead, :name) || custom_fields["name"] || "이름없음",
+        name: params.dig(:lead, :name) || custom_fields["name"] || custom_fields["company_name"] || "이름없음",
         phone: params.dig(:lead, :phone) || custom_fields["phone"],
         email: params.dig(:lead, :email) || custom_fields["email"],
         form: @form,
@@ -47,6 +50,10 @@ module Public
     end
 
     private
+
+    def form_not_found
+      render plain: "폼을 찾을 수 없거나 비활성화된 폼입니다.", status: :not_found
+    end
 
     def broadcast_new_lead(lead)
       if lead.assigned_to_id

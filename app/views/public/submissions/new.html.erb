@@ -1,50 +1,62 @@
 <% content_for(:title, @form.name) %>
-<div class="public-form-container">
-  <div class="public-form-card">
-    <h1 class="public-form-title"><%= @form.name %></h1>
-    <% if @form.description.present? %>
-      <p class="public-form-description"><%= @form.description %></p>
-    <% end %>
+
+<div class="pf-page">
+  <div class="pf-container">
+    <div class="pf-header">
+      <h1 class="pf-title"><%= @form.name %></h1>
+      <% if @form.description.present? %>
+        <p class="pf-desc"><%= @form.description %></p>
+      <% end %>
+    </div>
 
     <%= form_with url: public_form_submit_path(form_slug: @form.slug), method: :post, local: true do |f| %>
-      <%# UTM 파라미터를 hidden field로 전달 %>
       <%= hidden_field_tag :utm_source, params[:utm_source] %>
       <%= hidden_field_tag :utm_medium, params[:utm_medium] %>
       <%= hidden_field_tag :utm_campaign, params[:utm_campaign] %>
       <%= hidden_field_tag :utm_content, params[:utm_content] %>
       <%= hidden_field_tag :utm_term, params[:utm_term] %>
 
-      <% @form_fields.each do |field| %>
-        <div class="form-group">
-          <label class="form-label"><%= field.label %><%= " *" if field.required? %></label>
-          <% case field.field_type %>
-          <% when "text" %>
-            <input type="text" name="lead[<%= field.name %>]" class="form-input"
-                   placeholder="<%= field.label %>" <%= "required" if field.required? %>>
-          <% when "email" %>
-            <input type="email" name="lead[<%= field.name %>]" class="form-input"
-                   placeholder="이메일 주소" <%= "required" if field.required? %>>
-          <% when "phone" %>
-            <input type="tel" name="lead[<%= field.name %>]" class="form-input"
-                   placeholder="연락처" <%= "required" if field.required? %>>
-          <% when "textarea" %>
-            <textarea name="lead[<%= field.name %>]" class="form-textarea"
-                      placeholder="<%= field.label %>" rows="4" <%= "required" if field.required? %>></textarea>
-          <% when "select" %>
-            <select name="lead[<%= field.name %>]" class="form-select" <%= "required" if field.required? %>>
-              <option value="">선택하세요</option>
-              <% if field.options.present? %>
-                <% field.options.split(",").each do |opt| %>
-                  <option value="<%= opt.strip %>"><%= opt.strip %></option>
-                <% end %>
-              <% end %>
-            </select>
-          <% end %>
+      <%# 개인정보 동의 섹션 %>
+      <% if @form.privacy_policy_text.present? %>
+        <div class="pf-privacy-box">
+          <p class="pf-privacy-text"><%= @form.privacy_policy_text %></p>
+        </div>
+        <div class="pf-privacy-check">
+          <label class="pf-checkbox-label">
+            <input type="checkbox" name="privacy_agree" required>
+            <span>개인정보 수집 이용에 대한 동의</span>
+          </label>
         </div>
       <% end %>
 
-      <div class="form-actions">
-        <%= f.submit "문의하기", class: "btn-primary btn-full" %>
+      <%# 2열 그리드로 묶기 위한 로직 %>
+      <% fields_to_render = @form_fields.reject { |f| f.field_type == "privacy_checkbox" } %>
+      <% i = 0 %>
+      <div class="pf-fields">
+        <% while i < fields_to_render.length %>
+          <% field = fields_to_render[i] %>
+          <% next_field = fields_to_render[i + 1] %>
+
+          <% if field.half_width && next_field&.half_width? %>
+            <%# 두 필드 모두 half_width → 2열로 묶기 %>
+            <div class="pf-row-two">
+              <%= render "field", field: field %>
+              <%= render "field", field: next_field %>
+            </div>
+            <% i += 2 %>
+          <% else %>
+            <div class="pf-row-one">
+              <%= render "field", field: field %>
+            </div>
+            <% i += 1 %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="pf-submit">
+        <button type="submit" class="pf-btn-submit">
+          <%= @form.submit_button_text.presence || "상담문의" %>
+        </button>
       </div>
     <% end %>
   </div>

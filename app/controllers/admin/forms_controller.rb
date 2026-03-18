@@ -59,8 +59,14 @@ module Admin
     end
 
     def form_params
-      params.require(:form).permit(:name, :slug, :description, :redirect_url, :thank_you_message,
-        form_fields_attributes: [:id, :label, :field_type, :name, :required, :options, :position, :_destroy])
+      params.require(:form).permit(
+        :name, :description, :redirect_url, :thank_you_message,
+        :privacy_policy_text, :submit_button_text,
+        form_fields_attributes: [
+          :id, :label, :field_type, :name, :required, :options,
+          :placeholder, :half_width, :subtitle, :position, :_destroy
+        ]
+      )
     end
   end
 end

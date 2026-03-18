@@ -435,3 +435,262 @@ body {
 @media (max-width: 480px) {
   .kpi-grid { grid-template-columns: 1fr; }
 }
+
+/* === Public Form Redesign === */
+.pf-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f5f5;
+  display: block;
+  padding: 40px 20px 80px;
+}
+
+.pf-container {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.pf-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.pf-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+}
+
+.pf-desc {
+  font-size: 15px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.pf-privacy-box {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px 20px;
+  background: white;
+  margin-bottom: 12px;
+}
+
+.pf-privacy-text {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.7;
+}
+
+.pf-privacy-check {
+  margin-bottom: 28px;
+}
+
+.pf-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #222;
+  cursor: pointer;
+}
+
+.pf-checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #333;
+}
+
+.pf-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pf-row-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.pf-row-one {
+  display: block;
+}
+
+.pf-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pf-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.pf-required {
+  color: #e53935;
+  margin-right: 2px;
+}
+
+.pf-field-subtitle {
+  font-size: 13px;
+  color: #777;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+.pf-input,
+.pf-select,
+.pf-textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: white;
+  color: #1a1a1a;
+  transition: border-color 0.2s;
+}
+
+.pf-input:focus,
+.pf-select:focus,
+.pf-textarea:focus {
+  outline: none;
+  border-color: #4e598c;
+}
+
+.pf-input::placeholder,
+.pf-textarea::placeholder {
+  color: #aaa;
+}
+
+.pf-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.pf-submit {
+  margin-top: 32px;
+}
+
+.pf-btn-submit {
+  width: 100%;
+  padding: 18px;
+  background: #2c3356;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pf-btn-submit:hover {
+  background: #1e2440;
+}
+
+@media (max-width: 600px) {
+  .pf-row-two {
+    grid-template-columns: 1fr;
+  }
+  .pf-title {
+    font-size: 24px;
+  }
+}
+
+/* === Admin Form Builder Card UI === */
+.fb-field-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  background: white;
+  margin-bottom: 12px;
+}
+
+.fb-field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.fb-field-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fb-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.fb-field-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.fb-field-checks {
+  display: flex;
+  gap: 20px;
+}
+
+.fb-label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.fb-input,
+.fb-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.fb-input:focus,
+.fb-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Slug display in admin */
+.slug-display {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-tertiary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--text-secondary);
+  gap: 4px;
+}
+
+.slug-value {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .fb-field-grid,
+  .fb-field-bottom {
+    grid-template-columns: 1fr;
+  }
+}
