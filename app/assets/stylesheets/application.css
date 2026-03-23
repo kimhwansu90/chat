@@ -436,171 +436,70 @@ body {
   .kpi-grid { grid-template-columns: 1fr; }
 }
 
-/* === Public Form Redesign === */
-.pf-page {
-  width: 100%;
-  min-height: 100vh;
-  background: #f5f5f5;
-  display: block;
-  padding: 40px 20px 80px;
-}
+/* === Public Form === */
+.pf-page { width: 100%; min-height: 100vh; background: linear-gradient(135deg, #f8f9fc 0%, #eef0f5 100%); padding: 40px 20px 80px; }
+.pf-container { max-width: 640px; margin: 0 auto; }
 
-.pf-container {
-  max-width: 760px;
-  margin: 0 auto;
-}
+.pf-logo { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 32px; }
+.pf-logo-icon { width: 40px; height: 40px; background: #4e598c; color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; }
+.pf-logo-text { font-size: 18px; font-weight: 700; color: #4e598c; }
 
-.pf-header {
-  text-align: center;
-  margin-bottom: 32px;
-}
+.pf-header { text-align: center; margin-bottom: 28px; }
+.pf-title { font-size: 28px; font-weight: 800; color: #1a1a1a; margin-bottom: 8px; }
+.pf-desc { font-size: 14px; color: #666; line-height: 1.6; }
 
-.pf-title {
-  font-size: 32px;
-  font-weight: 800;
-  color: #1a1a1a;
-  margin-bottom: 12px;
-}
+.pf-card { background: white; border-radius: 16px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px; }
 
-.pf-desc {
-  font-size: 15px;
-  color: #555;
-  line-height: 1.6;
-}
+.pf-fields { display: flex; flex-direction: column; gap: 20px; }
+.pf-row-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pf-row-one { display: block; }
+.pf-field-group { display: flex; flex-direction: column; gap: 6px; }
+.pf-label { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+.pf-required { color: #e53935; margin-right: 2px; }
+.pf-field-subtitle { font-size: 12px; color: #888; line-height: 1.5; margin-bottom: 2px; }
 
-.pf-privacy-box {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px 20px;
-  background: white;
-  margin-bottom: 12px;
+.pf-input, .pf-select, .pf-textarea {
+  width: 100%; padding: 13px 16px; border: 1.5px solid #e0e0e0; border-radius: 10px;
+  font-size: 14px; font-family: inherit; background: #fafafa; color: #1a1a1a; transition: all 0.2s;
 }
+.pf-input:focus, .pf-select:focus, .pf-textarea:focus { outline: none; border-color: #4e598c; background: white; box-shadow: 0 0 0 3px rgba(78, 89, 140, 0.08); }
+.pf-input::placeholder, .pf-textarea::placeholder { color: #bbb; }
+.pf-textarea { resize: vertical; min-height: 100px; }
 
-.pf-privacy-text {
-  font-size: 13px;
-  color: #444;
-  line-height: 1.7;
-}
+.pf-privacy-section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+.pf-privacy-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.pf-privacy-title { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+.pf-privacy-expand { background: none; border: none; color: #4e598c; font-size: 12px; cursor: pointer; text-decoration: underline; }
+.pf-privacy-content { display: none; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-bottom: 12px; max-height: 200px; overflow-y: auto; }
+.pf-privacy-section.open .pf-privacy-content { display: block; }
+.pf-privacy-text { font-size: 12px; color: #555; line-height: 1.8; }
+.pf-privacy-text p { margin-bottom: 8px; }
 
-.pf-privacy-check {
-  margin-bottom: 28px;
-}
+.pf-checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #333; cursor: pointer; }
+.pf-checkbox-label input[type="checkbox"] { width: 18px; height: 18px; accent-color: #4e598c; }
 
-.pf-checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #222;
-  cursor: pointer;
-}
-
-.pf-checkbox-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: #333;
-}
-
-.pf-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.pf-row-two {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.pf-row-one {
-  display: block;
-}
-
-.pf-field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.pf-label {
-  font-size: 15px;
-  font-weight: 700;
-  color: #1a1a1a;
-}
-
-.pf-required {
-  color: #e53935;
-  margin-right: 2px;
-}
-
-.pf-field-subtitle {
-  font-size: 13px;
-  color: #777;
-  line-height: 1.5;
-  margin-bottom: 4px;
-}
-
-.pf-input,
-.pf-select,
-.pf-textarea {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1.5px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-  background: white;
-  color: #1a1a1a;
-  transition: border-color 0.2s;
-}
-
-.pf-input:focus,
-.pf-select:focus,
-.pf-textarea:focus {
-  outline: none;
-  border-color: #4e598c;
-}
-
-.pf-input::placeholder,
-.pf-textarea::placeholder {
-  color: #aaa;
-}
-
-.pf-textarea {
-  resize: vertical;
-  min-height: 120px;
-}
-
-.pf-submit {
-  margin-top: 32px;
-}
-
+.pf-submit { margin-top: 24px; }
 .pf-btn-submit {
-  width: 100%;
-  padding: 18px;
-  background: #2c3356;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.2s;
+  width: 100%; padding: 16px; background: #4e598c; color: white; border: none; border-radius: 12px;
+  font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(78, 89, 140, 0.3);
 }
+.pf-btn-submit:hover { background: #3d4670; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(78, 89, 140, 0.4); }
+.pf-btn-submit:active { transform: translateY(0); }
 
-.pf-btn-submit:hover {
-  background: #1e2440;
-}
+.pf-footer-text { text-align: center; font-size: 11px; color: #aaa; margin-top: 16px; }
+
+.pf-btn-select-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.pf-btn-option { cursor: pointer; }
+.pf-btn-option input { display: none; }
+.pf-btn-option span { display: inline-block; padding: 10px 16px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 13px; font-family: inherit; color: #444; background: #fafafa; transition: all 0.15s; user-select: none; }
+.pf-btn-option span:hover { border-color: #4e598c; color: #4e598c; }
+.pf-btn-option input:checked + span { background: #4e598c; color: white; border-color: #4e598c; }
 
 @media (max-width: 600px) {
-  .pf-row-two {
-    grid-template-columns: 1fr;
-  }
-  .pf-title {
-    font-size: 24px;
-  }
+  .pf-row-two { grid-template-columns: 1fr; }
+  .pf-title { font-size: 22px; }
+  .pf-card { padding: 24px 20px; }
 }
 
 /* === Admin Form Builder Card UI === */
@@ -733,3 +632,49 @@ body {
 /* === ROI Report === */
 .roi-positive { color: var(--success); font-weight: 700; }
 .roi-negative { color: var(--danger); font-weight: 700; }
+
+/* === Simple Form Builder === */
+.fb-simple-row {
+  display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+  background: white; border: 1px solid var(--border); border-radius: var(--radius-md);
+  margin-bottom: 6px;
+}
+.fb-simple-grip { color: var(--text-tertiary); cursor: grab; font-size: 14px; flex-shrink: 0; }
+.fb-simple-label { flex: 2; min-width: 0; }
+.fb-simple-type { flex: 1; min-width: 100px; }
+.fb-simple-options { flex: 2; min-width: 0; }
+.fb-simple-check { flex-shrink: 0; font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.btn-remove-sm { flex-shrink: 0; background: none; border: none; color: var(--text-tertiary); font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1; }
+.btn-remove-sm:hover { color: var(--danger); }
+.btn-add-field { margin-top: 8px; padding: 10px; width: 100%; border: 2px dashed var(--border); border-radius: var(--radius-md); background: none; color: var(--text-secondary); font-size: 14px; cursor: pointer; transition: all 0.15s; }
+.btn-add-field:hover { border-color: var(--primary); color: var(--primary); background: rgba(78, 89, 140, 0.03); }
+
+.link-copy-row { display: flex; align-items: center; gap: 8px; }
+.link-display { flex: 1; padding: 8px 12px; background: var(--bg-secondary); border-radius: var(--radius-md); font-size: 13px; color: var(--text-primary); word-break: break-all; }
+
+/* === Form Cards Grid === */
+.form-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.form-card { background: white; border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); }
+.form-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.form-card-name { font-size: 16px; font-weight: 700; }
+.form-card-name a { color: var(--text-primary); text-decoration: none; }
+.form-card-name a:hover { color: var(--primary); }
+.form-card-link { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 8px 12px; background: var(--bg-secondary); border-radius: var(--radius-md); }
+.form-card-link code { flex: 1; font-size: 12px; color: var(--text-secondary); word-break: break-all; }
+.btn-copy-sm { flex-shrink: 0; padding: 4px 10px; font-size: 11px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; }
+.btn-copy-sm:hover { background: var(--primary-dark); }
+.form-card-stats { display: flex; gap: 24px; margin-bottom: 16px; }
+.form-card-stat-value { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+.form-card-stat-label { font-size: 12px; color: var(--text-secondary); margin-left: 4px; }
+.form-card-actions { display: flex; gap: 6px; border-top: 1px solid var(--border-light); padding-top: 12px; }
+
+/* === Lead Card Tags === */
+.lead-card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.lead-card-form { display: inline-block; padding: 2px 6px; background: rgba(78, 89, 140, 0.1); color: var(--primary); border-radius: 4px; font-size: 10px; font-weight: 600; }
+
+@media (max-width: 768px) {
+  .fb-simple-row { flex-wrap: wrap; }
+  .fb-simple-grip { display: none; }
+  .fb-simple-label, .fb-simple-type, .fb-simple-options { flex: 1 1 100%; }
+  .form-cards-grid { grid-template-columns: 1fr; }
+}

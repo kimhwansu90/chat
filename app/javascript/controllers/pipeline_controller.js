@@ -4,50 +4,49 @@ export default class extends Controller {
   static targets = ["column"]
 
   connect() {
-    this._dragging = false
+    this._draggedCard = null
+    this._draggedCardId = null
+    this._originalColumn = null
+    this._processing = false
   }
 
-  // ─── 카드 이벤트 ────────────────────────────────────────────
+  // ─── 카드 이벤트 ─────────────────────────────────────────────
+
   dragStart(event) {
-    this._dragging = true
     const card = event.currentTarget
+    this._draggedCard = card
+    this._draggedCardId = card.dataset.leadId
+    this._originalColumn = card.closest(".pipeline-column-body")
+    this._processing = false
+
     card.classList.add("dragging")
-    event.dataTransfer.setData("text/plain", card.dataset.leadId)
     event.dataTransfer.effectAllowed = "move"
+    event.dataTransfer.setData("text/plain", this._draggedCardId)
   }
 
   dragEnd(event) {
     event.currentTarget.classList.remove("dragging")
-    setTimeout(() => { this._dragging = false }, 100)
+    this.columnTargets.forEach(col => col.classList.remove("drag-over"))
+
+    setTimeout(() => {
+      this._draggedCard = null
+      this._draggedCardId = null
+      this._originalColumn = null
+      this._processing = false
+    }, 50)
   }
 
   openLead(event) {
-    if (this._dragging) return
+    if (this._draggedCard) return
     const href = event.currentTarget.dataset.href
     if (href) window.location.href = href
   }
 
-  // 카드 위에 드래그할 때 – 부모 컬럼으로 위임
-  cardDragOver(event) {
-    event.preventDefault()
-    event.dataTransfer.dropEffect = "move"
-    const column = event.currentTarget.closest(".pipeline-column-body")
-    if (column) column.classList.add("drag-over")
-  }
+  // ─── 컬럼 이벤트 ─────────────────────────────────────────────
 
-  // 카드 위에 드롭할 때 – 부모 컬럼을 대상으로 처리
-  cardDrop(event) {
-    event.preventDefault()
-    event.stopPropagation()            // 컬럼 drop �핸들러 중복 방지
-    const column = event.currentTarget.closest(".pipeline-column-body")
-    if (column) this.processDropOnColumn(event, column)
-  }
-
-  // ─── 컬럼 이벤트 (빈 공간에 드롭 시) ───────────────────────
   dragOver(event) {
     event.preventDefault()
     event.dataTransfer.dropEffect = "move"
-    event.currentTarget.classList.add("drag-over")
   }
 
   dragEnter(event) {
@@ -56,44 +55,47 @@ export default class extends Controller {
   }
 
   dragLeave(event) {
-    if (!event.currentTarget.contains(event.relatedTarget)) {
-      event.currentTarget.classList.remove("drag-over")
+    const column = event.currentTarget
+    if (!column.contains(event.relatedTarget)) {
+      column.classList.remove("drag-over")
     }
   }
 
-  drop(event) {
+  async drop(event) {
     event.preventDefault()
-    this.processDropOnColumn(event, event.currentTarget)
-  }
-
-  // ─── 공통 처리 ──────────────────────────────────────────────
-  async processDropOnColumn(event, column) {
+    const column = event.currentTarget
     column.classList.remove("drag-over")
-    // 모든 컬럼의 drag-over 클래스 정리
     this.columnTargets.forEach(c => c.classList.remove("drag-over"))
 
-    const leadId = event.dataTransfer.getData("text/plain")
+    if (this._processing) return
+
+    // 인스턴스 변수 우선, fallback으로 dataTransfer
+    const leadId = this._draggedCardId || event.dataTransfer.getData("text/plain")
+    const card = this._draggedCard || document.getElementById(`lead_${leadId}`)
+    if (!leadId || !card) return
+
     const newStatus = column.dataset.status
+    if (!newStatus) return
 
-    if (!leadId || !newStatus) return
+    const originalColumn = this._originalColumn || card.closest(".pipeline-column-body")
+    if (originalColumn === column) return
 
-    const card = document.getElementById(`lead_${leadId}`)
-    if (!card) return
+    this._processing = true
 
-    const originalParent = card.parentElement
-    if (originalParent === column) return   // 같은 컬럼이면 무시
-
+    // 낙관적 UI 업데이트
     column.appendChild(card)
+    this._updateColumnCounts()
 
-    const ok = await this.updateLeadStatus(leadId, newStatus)
+    const ok = await this._updateLeadStatus(leadId, newStatus)
     if (!ok) {
-      originalParent.appendChild(card)
-    } else {
-      this.updateColumnCounts()
+      originalColumn.appendChild(card)
+      this._updateColumnCounts()
     }
   }
 
-  async updateLeadStatus(leadId, newStatus) {
+  // ─── 내부 메서드 ─────────────────────────────────────────────
+
+  async _updateLeadStatus(leadId, newStatus) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
     try {
       const response = await fetch(`/admin/leads/${leadId}/update_status`, {
@@ -113,9 +115,10 @@ export default class extends Controller {
     }
   }
 
-  updateColumnCounts() {
+  _updateColumnCounts() {
     this.columnTargets.forEach(column => {
-      const header = column.closest(".pipeline-column")?.querySelector(".pipeline-column-count")
+      const header = column.closest(".pipeline-column")
+        ?.querySelector(".pipeline-column-count")
       if (header) {
         header.textContent = column.querySelectorAll(".lead-card").length
       }

@@ -42,18 +42,31 @@ module NaverAds
       get("/ncc/keywords?nccAdgroupId=#{ad_group_id}")
     end
 
-    # 성과 리포트 조회
-    def report(report_type:, date_from:, date_to:, id: nil)
-      params = {
-        reportTp: report_type.upcase,
-        timeRange: {
-          since: date_from.strftime("%Y-%m-%d"),
-          until: date_to.strftime("%Y-%m-%d")
-        }
-      }
-      params[:id] = id if id.present?
+    # 성과 통계 조회 (GET /stats)
+    # stat_type: "CAMP" | "ADGRP" | "KWD"
+    STAT_FIELDS = %w[impCnt clkCnt salesAmt ctr cpc ccnt convAmt avgRnk].freeze
 
-      post("/stats/master", params)
+    def stats(stat_type:, date_from:, date_to:, id: nil, fields: nil)
+      query_params = {
+        fields: (fields || STAT_FIELDS).join(","),
+        timeUnit: "DAY",
+        dateFrom: date_from.strftime("%Y%m%d"),
+        dateTo: date_to.strftime("%Y%m%d"),
+        statType: stat_type.upcase
+      }
+      query_params[:id] = id if id.present?
+
+      get("/stats?#{URI.encode_www_form(query_params)}")
+    end
+
+    # 키워드 입찰가 수정
+    def update_keyword_bid(keyword_id, bid_amount)
+      put("/ncc/keywords/#{keyword_id}", { bidAmt: bid_amount.to_i })
+    end
+
+    # 캠페인 일시중지 / 재개
+    def update_campaign_status(campaign_id, status)
+      put("/ncc/campaigns/#{campaign_id}", { userLock: status == "PAUSED" })
     end
 
     private
@@ -64,6 +77,10 @@ module NaverAds
 
     def post(path, body)
       request(:POST, path, body: body)
+    end
+
+    def put(path, body)
+      request(:PUT, path, body: body)
     end
 
     def request(method, path, body: nil)
@@ -85,7 +102,7 @@ module NaverAds
     end
 
     def build_request(method, uri, timestamp, body)
-      req_class = { GET: Net::HTTP::Get, POST: Net::HTTP::Post }[method]
+      req_class = { GET: Net::HTTP::Get, POST: Net::HTTP::Post, PUT: Net::HTTP::Put }[method]
       req = req_class.new(uri)
 
       req["X-API-KEY"] = @account.api_key

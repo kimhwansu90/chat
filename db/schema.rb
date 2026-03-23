@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_18_080325) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_18_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,15 +42,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_080325) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "ad_spends", force: :cascade do |t|
+    t.bigint "amount", default: 0, null: false
+    t.string "campaign_name", null: false
+    t.string "channel", null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id"
+    t.text "memo"
+    t.date "period_end", null: false
+    t.date "period_start", null: false
+    t.bigint "revenue", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["channel"], name: "index_ad_spends_on_channel"
+    t.index ["created_by_id"], name: "index_ad_spends_on_created_by_id"
+    t.index ["period_start", "period_end"], name: "index_ad_spends_on_period_start_and_period_end"
+  end
+
   create_table "form_fields", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "field_type", default: "text", null: false
     t.bigint "form_id", null: false
+    t.boolean "half_width", default: false, null: false
     t.string "label", null: false
     t.string "name", null: false
     t.text "options"
+    t.string "placeholder"
     t.integer "position", default: 0, null: false
     t.boolean "required", default: false, null: false
+    t.text "subtitle"
     t.datetime "updated_at", null: false
     t.index ["form_id", "position"], name: "index_form_fields_on_form_id_and_position"
     t.index ["form_id"], name: "index_form_fields_on_form_id"
@@ -62,8 +81,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_080325) do
     t.bigint "created_by_id"
     t.text "description"
     t.string "name", null: false
+    t.text "privacy_policy_text"
     t.string "redirect_url"
     t.string "slug", null: false
+    t.string "submit_button_text", default: "상담문의"
     t.string "thank_you_message", default: "문의가 접수되었습니다."
     t.datetime "updated_at", null: false
     t.index ["created_by_id"], name: "index_forms_on_created_by_id"
@@ -85,6 +106,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_080325) do
 
   create_table "leads", force: :cascade do |t|
     t.bigint "assigned_to_id"
+    t.bigint "contract_value", default: 0
+    t.datetime "contracted_at"
     t.datetime "created_at", null: false
     t.jsonb "custom_fields", default: {}
     t.string "email"
@@ -103,6 +126,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_080325) do
     t.string "utm_term"
     t.index ["assigned_to_id", "status"], name: "index_leads_on_assigned_to_id_and_status"
     t.index ["assigned_to_id"], name: "index_leads_on_assigned_to_id"
+    t.index ["contracted_at"], name: "index_leads_on_contracted_at"
     t.index ["created_at"], name: "index_leads_on_created_at"
     t.index ["form_id"], name: "index_leads_on_form_id"
     t.index ["status"], name: "index_leads_on_status"
@@ -199,6 +223,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_080325) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ad_spends", "users", column: "created_by_id"
   add_foreign_key "form_fields", "forms"
   add_foreign_key "forms", "users", column: "created_by_id"
   add_foreign_key "lead_activities", "leads"

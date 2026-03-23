@@ -3,17 +3,20 @@
      draggable="true"
      data-lead-id="<%= lead.id %>"
      data-href="<%= admin_lead_path(lead) %>"
-     data-action="dragstart->pipeline#dragStart dragend->pipeline#dragEnd click->pipeline#openLead dragover->pipeline#cardDragOver drop->pipeline#cardDrop">
+     data-action="dragstart->pipeline#dragStart dragend->pipeline#dragEnd click->pipeline#openLead">
   <div class="lead-card-name"><%= lead.name %></div>
   <% if lead.phone.present? %>
     <div class="lead-card-info"><%= lead.phone %></div>
   <% end %>
   <div class="lead-card-meta">
-    <% if lead.utm_source.present? %>
-      <span class="lead-card-source"><%= lead.utm_source %></span>
-    <% else %>
-      <span class="lead-card-source">직접</span>
-    <% end %>
+    <div class="lead-card-tags">
+      <% if lead.form %>
+        <span class="lead-card-form"><%= lead.form.name %></span>
+      <% end %>
+      <% if lead.utm_source.present? %>
+        <span class="lead-card-source"><%= lead.utm_source %></span>
+      <% end %>
+    </div>
     <% if lead.assigned_to %>
       <span class="lead-card-assignee">
         <span class="assignee-dot"></span>
