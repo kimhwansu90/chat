@@ -9,30 +9,23 @@
 
   <div class="form-group">
     <label class="form-label">폼 이름 *</label>
-    <%= f.text_field :name, class: "form-input", required: true, placeholder: "예: 리뷰노트 상담문의" %>
+    <%= f.text_field :name, class: "form-input", required: true, placeholder: "예: 무료 상담 신청" %>
   </div>
 
   <% if form.persisted? %>
     <div class="form-group">
-      <label class="form-label">폼 URL (자동생성, 수정 불가)</label>
-      <div class="slug-display">
-        <span class="slug-prefix">/f/</span>
-        <span class="slug-value"><%= form.slug %></span>
+      <label class="form-label">공유 링크</label>
+      <div class="link-copy-row">
+        <code class="link-display" id="form-url"><%= request.base_url %>/f/<%= form.slug %></code>
+        <button type="button" class="btn-secondary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('form-url').textContent).then(()=>{this.textContent='복사됨!';setTimeout(()=>{this.textContent='복사'},1500)})">복사</button>
       </div>
-      <p class="info-text mt-16">전체 URL: /f/<%= form.slug %></p>
-      <%= f.hidden_field :slug, value: form.slug %>
     </div>
   <% end %>
 
   <div class="form-group">
-    <label class="form-label">폼 설명 (제목 아래 표시)</label>
-    <%= f.text_field :description, class: "form-input", placeholder: "예: 성의 없이 문의를 하는 분은 회신하지 않습니다." %>
-  </div>
-
-  <div class="form-group">
-    <label class="form-label">개인정보 동의 안내문 (비워두면 미표시)</label>
-    <%= f.text_area :privacy_policy_text, class: "form-textarea", rows: 3,
-        placeholder: '예: 리뷰노트 이용에 필요한 상담을 위하여 "개인정보제공 수집 및 활용에 대한 동의내용"중 개인 식별정보(성명, 전화번호, 업체명, 업종)및 선택적 정보 제공에 동의합니다.' %>
+    <label class="form-label">개인정보 동의 안내문 <span style="color: var(--text-tertiary); font-weight: 400;">(비워두면 미표시)</span></label>
+    <%= f.text_area :privacy_policy_text, class: "form-textarea", rows: 2,
+        placeholder: '예: 개인정보 수집 및 활용에 동의합니다.' %>
   </div>
 
   <div class="form-group">
@@ -40,74 +33,47 @@
     <%= f.text_field :submit_button_text, class: "form-input", placeholder: "상담문의" %>
   </div>
 
-  <div class="form-group">
-    <label class="form-label">감사 메시지</label>
-    <%= f.text_field :thank_you_message, class: "form-input", placeholder: "문의가 접수되었습니다." %>
-  </div>
+  <%# 숨김 필드 — 기본값 유지 %>
+  <%= f.hidden_field :description, value: form.description %>
+  <%= f.hidden_field :thank_you_message, value: form.thank_you_message.presence || "문의가 접수되었습니다. 빠르게 연락 드리겠습니다." %>
+  <%= f.hidden_field :redirect_url, value: form.redirect_url %>
 
-  <div class="form-group">
-    <label class="form-label">제출 후 이동 URL (선택)</label>
-    <%= f.text_field :redirect_url, class: "form-input", placeholder: "https://..." %>
-  </div>
-
-  <h3 style="margin-top: 24px; margin-bottom: 4px; font-size: 16px; font-weight: 600;">폼 필드</h3>
-  <p class="info-text" style="margin-bottom: 12px;">2열 레이아웃은 연속된 두 필드가 모두 "2열" 체크 시 나란히 배치됩니다.</p>
+  <h3 class="section-title" style="margin-top: 24px;">문의 필드</h3>
 
   <div data-controller="form-builder">
     <div data-form-builder-target="container">
       <% form.form_fields.each_with_index do |field, index| %>
         <%= f.fields_for :form_fields, field, index: index do |ff| %>
-          <div class="fb-field-card" data-form-builder-target="field">
-            <div class="fb-field-header">
-              <span class="fb-field-label"><%= field.label.presence || "새 필드" %></span>
-              <button type="button" class="btn-remove-field" data-action="click->form-builder#removeField">&times;</button>
+          <div class="fb-simple-row" data-form-builder-target="field">
+            <div class="fb-simple-grip">&#x2630;</div>
+            <div class="fb-simple-label">
+              <%= ff.text_field :label, class: "fb-input", placeholder: "질문 입력", required: true %>
             </div>
-            <div class="fb-field-grid">
-              <div>
-                <label class="fb-label">라벨 *</label>
-                <%= ff.text_field :label, class: "fb-input", placeholder: "예: 상호명", required: true %>
-              </div>
-              <div>
-                <label class="fb-label">필드 유형</label>
-                <%= ff.select :field_type,
-                    [["텍스트", "text"], ["이메일", "email"], ["전화번호", "phone"],
-                     ["드롭다운", "select"], ["텍스트박스", "textarea"], ["개인정보동의", "privacy_checkbox"], ["버튼선택", "button_select"]],
-                    {}, { class: "fb-select" } %>
-              </div>
-              <div>
-                <label class="fb-label">필드명 (영문, 저장 키)</label>
-                <%= ff.text_field :name, class: "fb-input", placeholder: "예: company_name" %>
-              </div>
-              <div>
-                <label class="fb-label">플레이스홀더</label>
-                <%= ff.text_field :placeholder, class: "fb-input", placeholder: "입력 안내 문구" %>
-              </div>
+            <div class="fb-simple-type">
+              <%= ff.select :field_type,
+                  [["텍스트", "text"], ["이메일", "email"], ["전화번호", "phone"],
+                   ["드롭다운", "select"], ["서술형", "textarea"], ["버튼선택", "button_select"]],
+                  {}, { class: "fb-select" } %>
             </div>
-            <div class="fb-field-bottom">
-              <div>
-                <label class="fb-label">선택지 (select 유형, 쉼표 구분)</label>
-                <%= ff.text_field :options, class: "fb-input", placeholder: "옵션1,옵션2,옵션3" %>
-              </div>
-              <div>
-                <label class="fb-label">설명 (필드 아래 표시)</label>
-                <%= ff.text_field :subtitle, class: "fb-input", placeholder: "추가 안내 문구" %>
-              </div>
+            <div class="fb-simple-options">
+              <%= ff.text_field :options, class: "fb-input", placeholder: "선택지 (쉼표 구분)" %>
             </div>
-            <div class="fb-field-checks">
-              <label class="form-checkbox">
-                <%= ff.check_box :required %> 필수 입력
-              </label>
-              <label class="form-checkbox">
-                <%= ff.check_box :half_width %> 2열 배치 (옆 필드도 2열 체크 시 나란히)
-              </label>
-            </div>
+            <label class="fb-simple-check">
+              <%= ff.check_box :required %> 필수
+            </label>
+            <button type="button" class="btn-remove-sm" data-action="click->form-builder#removeField">&times;</button>
+            <%# 자동 생성 필드 %>
+            <%= ff.hidden_field :name, value: field.name.presence || "field_#{index}" %>
             <%= ff.hidden_field :position, value: index %>
+            <%= ff.hidden_field :placeholder, value: field.placeholder %>
+            <%= ff.hidden_field :subtitle, value: field.subtitle %>
+            <%= ff.hidden_field :half_width, value: field.half_width ? "1" : "0" %>
           </div>
         <% end %>
       <% end %>
     </div>
 
-    <button type="button" class="btn-secondary btn-sm" style="margin-top: 8px;"
+    <button type="button" class="btn-add-field"
             data-action="click->form-builder#addField"
             data-form-builder-target="addBtn">
       + 필드 추가
@@ -115,7 +81,7 @@
   </div>
 
   <div class="form-actions">
-    <%= f.submit form.persisted? ? "수정" : "생성", class: "btn-primary" %>
+    <%= f.submit form.persisted? ? "저장" : "폼 생성", class: "btn-primary" %>
     <%= link_to "취소", admin_forms_path, class: "btn-secondary" %>
   </div>
 <% end %>
