@@ -12,7 +12,7 @@
     <meta property="og:description" content="<%= content_for(:meta_description) || "HS Solution - 리드 관리 및 영업 전환 추적 시스템" %>">
     <meta property="og:type" content="website">
     <meta property="og:url" content="<%= request.original_url %>">
-    <meta property="og:image" content="<%= request.base_url %>/icon.png">
+    <meta property="og:image" content="<%= request.base_url %>/hs-icon.png">
     <meta property="og:site_name" content="HS Solution">
     <meta property="og:locale" content="ko_KR">
 
@@ -20,7 +20,7 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="<%= content_for(:title) || "HS Solution - 리드 관리 시스템" %>">
     <meta name="twitter:description" content="<%= content_for(:meta_description) || "HS Solution - 리드 관리 및 영업 전환 추적 시스템" %>">
-    <meta name="twitter:image" content="<%= request.base_url %>/icon.png">
+    <meta name="twitter:image" content="<%= request.base_url %>/hs-icon.png">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="<%= request.original_url.split('?').first %>">
@@ -38,11 +38,11 @@
 
     <%= yield :head %>
 
-    <!-- 파비콘 설정 (v2 캐시 버스팅) -->
-    <link rel="icon" href="/favicon.ico?v=2" sizes="any">
-    <link rel="icon" href="/icon.svg?v=2" type="image/svg+xml">
-    <link rel="icon" href="/icon.png?v=2" type="image/png" sizes="512x512">
-    <link rel="apple-touch-icon" href="/icon.png?v=2">
+    <!-- 파비콘 설정 -->
+    <link rel="icon" href="/hs-favicon.ico" sizes="any">
+    <link rel="icon" href="/hs-icon.svg" type="image/svg+xml">
+    <link rel="icon" href="/hs-icon.png" type="image/png" sizes="512x512">
+    <link rel="apple-touch-icon" href="/hs-icon.png">
 
     <!-- 스타일시트 로드 -->
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
