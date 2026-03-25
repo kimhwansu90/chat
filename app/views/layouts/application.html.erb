@@ -39,10 +39,10 @@
     <%= yield :head %>
 
     <!-- 파비콘 설정 -->
-    <link rel="icon" href="/hs-favicon.ico" sizes="any">
-    <link rel="icon" href="/hs-icon.svg" type="image/svg+xml">
-    <link rel="icon" href="/hs-icon.png" type="image/png" sizes="512x512">
-    <link rel="apple-touch-icon" href="/hs-icon.png">
+    <link rel="icon" href="/hs-icon.svg?v=<%= Rails.application.config.asset_version rescue '3' %>" type="image/svg+xml">
+    <link rel="icon" href="/hs-icon.png?v=3" type="image/png" sizes="512x512">
+    <link rel="apple-touch-icon" href="/hs-icon.png?v=3">
+    <link rel="shortcut icon" href="/favicon.ico?v=3">
 
     <!-- 스타일시트 로드 -->
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
